@@ -20,6 +20,10 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Optional
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
