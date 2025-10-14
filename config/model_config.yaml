@@ -1,0 +1,28 @@
+# NLP Configuration
+nlp:
+  word2vec:
+    vector_size: 100
+    window: 5
+    min_count: 2
+    workers: 4
+    epochs: 10
+
+  sentiment:
+    learning_rate: 0.01
+    epochs: 100
+    batch_size: 32
+
+# CV Configuration
+cv:
+  hand_detection:
+    min_detection_confidence: 0.5
+    min_tracking_confidence: 0.5
+
+  size_thresholds:
+    small_max: 150  # pixels
+    medium_max: 200  # pixels
+
+# Recommendation
+recommendation:
+  min_confidence: 0.6
+  max_results: 5

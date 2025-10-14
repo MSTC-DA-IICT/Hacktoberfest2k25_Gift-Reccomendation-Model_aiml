@@ -1,0 +1,64 @@
+{
+  "gifts": [
+    {
+      "id": 1,
+      "name": "Toy Car",
+      "category": "toy",
+      "hand_size": "small",
+      "sentiment_min": 0.5,
+      "sentiment_max": 1.0,
+      "price_range": "$10-$20",
+      "description": "Colorful toy car for kids"
+    },
+    {
+      "id": 2,
+      "name": "Story Book",
+      "category": "book",
+      "hand_size": "small",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$8-$15",
+      "description": "Engaging storybook for young readers"
+    },
+    {
+      "id": 3,
+      "name": "Stylish Watch",
+      "category": "accessory",
+      "hand_size": "medium",
+      "sentiment_min": 0.5,
+      "sentiment_max": 1.0,
+      "price_range": "$50-$100",
+      "description": "Elegant watch for daily wear"
+    },
+    {
+      "id": 4,
+      "name": "Comfort Pillow",
+      "category": "home",
+      "hand_size": "medium",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$25-$40",
+      "description": "Soft pillow for relaxation"
+    },
+    {
+      "id": 5,
+      "name": "Elegant Jewelry",
+      "category": "jewelry",
+      "hand_size": "large",
+      "sentiment_min": 0.5,
+      "sentiment_max": 1.0,
+      "price_range": "$100-$300",
+      "description": "Beautiful jewelry piece"
+    },
+    {
+      "id": 6,
+      "name": "Coffee Maker",
+      "category": "appliance",
+      "hand_size": "large",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$50-$150",
+      "description": "Quality coffee maker"
+    }
+  ]
+}

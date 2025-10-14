@@ -1,0 +1,33 @@
+# Core ML/NLP
+numpy>=1.24.0
+gensim>=4.3.0
+nltk>=3.8.0
+
+# Computer Vision
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+Pillow>=10.0.0
+
+# Data Processing
+pandas>=2.0.0
+
+# Web & API
+streamlit>=1.28.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+
+# Utilities
+pyyaml>=6.0
+python-dotenv>=1.0.0
+click>=8.1.0
+
+# Testing & Dev
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.1.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
