@@ -211,60 +211,6 @@ def create_default_gift_database() -> List[Dict]:
             "sentiment_max": 0.8,
             "price_range": "$30-$60",
             "description": "Premium tea collection with accessories"
-        },
-        {
-            "id": 18,
-            "name": "Gaming Mouse",
-            "category": "tech",
-            "hand_size": "large",
-            "sentiment_min": 0.5,
-            "sentiment_max": 1.0,
-            "price_range": "$45-$90",
-            "description": "High-precision gaming mouse with RGB lighting"
-        },
-
-        # Jewelry items
-        {
-            "id": 19,
-            "name": "Silver Bracelet",
-            "category": "jewelry",
-            "hand_size": "small",
-            "sentiment_min": 0.5,
-            "sentiment_max": 1.0,
-            "price_range": "$40-$80",
-            "description": "Elegant silver bracelet with charm"
-        },
-        {
-            "id": 20,
-            "name": "Gold Necklace",
-            "category": "jewelry",
-            "hand_size": "medium",
-            "sentiment_min": 0.6,
-            "sentiment_max": 1.0,
-            "price_range": "$150-$300",
-            "description": "Beautiful gold necklace with pendant"
-        },
-
-        # Puzzle items
-        {
-            "id": 21,
-            "name": "1000-Piece Jigsaw Puzzle",
-            "category": "puzzle",
-            "hand_size": "medium",
-            "sentiment_min": 0.3,
-            "sentiment_max": 0.8,
-            "price_range": "$15-$25",
-            "description": "Challenging puzzle with beautiful artwork"
-        },
-        {
-            "id": 22,
-            "name": "3D Wooden Puzzle",
-            "category": "puzzle",
-            "hand_size": "small",
-            "sentiment_min": 0.4,
-            "sentiment_max": 0.9,
-            "price_range": "$20-$35",
-            "description": "Intricate 3D puzzle for spatial thinking"
         }
     ]
 
