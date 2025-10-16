@@ -57,7 +57,9 @@ def calculate_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
         return 0.0
 
 
-def calculate_precision_recall_f1(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
+def calculate_precision_recall_f1(
+    y_true: np.ndarray, y_pred: np.ndarray
+) -> Dict[str, float]:
     """
     Calculate precision, recall, and F1-score for binary classification.
 
@@ -93,22 +95,26 @@ def calculate_precision_recall_f1(y_true: np.ndarray, y_pred: np.ndarray) -> Dic
         # Calculate metrics with zero-division handling
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        f1 = (
+            2 * (precision * recall) / (precision + recall)
+            if (precision + recall) > 0
+            else 0.0
+        )
 
         # Calculate additional metrics
         specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
         accuracy = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
 
         metrics = {
-            'precision': round(precision, 4),
-            'recall': round(recall, 4),
-            'f1': round(f1, 4),
-            'specificity': round(specificity, 4),
-            'accuracy': round(accuracy, 4),
-            'true_positives': int(tp),
-            'true_negatives': int(tn),
-            'false_positives': int(fp),
-            'false_negatives': int(fn)
+            "precision": round(precision, 4),
+            "recall": round(recall, 4),
+            "f1": round(f1, 4),
+            "specificity": round(specificity, 4),
+            "accuracy": round(accuracy, 4),
+            "true_positives": int(tp),
+            "true_negatives": int(tn),
+            "false_positives": int(fp),
+            "false_negatives": int(fn),
         }
 
         logger.debug(f"Calculated metrics: {metrics}")
@@ -117,17 +123,25 @@ def calculate_precision_recall_f1(y_true: np.ndarray, y_pred: np.ndarray) -> Dic
     except Exception as e:
         logger.error(f"Error calculating precision/recall/F1: {e}")
         return {
-            'precision': 0.0, 'recall': 0.0, 'f1': 0.0,
-            'specificity': 0.0, 'accuracy': 0.0,
-            'true_positives': 0, 'true_negatives': 0,
-            'false_positives': 0, 'false_negatives': 0
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "specificity": 0.0,
+            "accuracy": 0.0,
+            "true_positives": 0,
+            "true_negatives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
         }
 
 
-def plot_confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray,
-                         labels: Optional[List[str]] = None,
-                         save_path: Optional[str] = None,
-                         normalize: bool = False) -> Optional[plt.Figure]:
+def plot_confusion_matrix(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    labels: Optional[List[str]] = None,
+    save_path: Optional[str] = None,
+    normalize: bool = False,
+) -> Optional[plt.Figure]:
     """
     Plot confusion matrix.
 
@@ -160,32 +174,37 @@ def plot_confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray,
         cm = sklearn_confusion_matrix(y_true, y_pred)
 
         if normalize:
-            cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-            fmt = '.2f'
-            title = 'Normalized Confusion Matrix'
+            cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+            fmt = ".2f"
+            title = "Normalized Confusion Matrix"
         else:
-            fmt = 'd'
-            title = 'Confusion Matrix'
+            fmt = "d"
+            title = "Confusion Matrix"
 
         # Create figure
         fig, ax = plt.subplots(figsize=(8, 6))
 
         # Plot heatmap
-        sns.heatmap(cm, annot=True, fmt=fmt, cmap='Blues',
-                   xticklabels=labels or ['Class 0', 'Class 1'],
-                   yticklabels=labels or ['Class 0', 'Class 1'],
-                   ax=ax)
+        sns.heatmap(
+            cm,
+            annot=True,
+            fmt=fmt,
+            cmap="Blues",
+            xticklabels=labels or ["Class 0", "Class 1"],
+            yticklabels=labels or ["Class 0", "Class 1"],
+            ax=ax,
+        )
 
         ax.set_title(title)
-        ax.set_ylabel('True Label')
-        ax.set_xlabel('Predicted Label')
+        ax.set_ylabel("True Label")
+        ax.set_xlabel("Predicted Label")
 
         # Adjust layout
         plt.tight_layout()
 
         # Save if path provided
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             logger.info(f"Confusion matrix saved to {save_path}")
 
         logger.debug("Generated confusion matrix plot")
@@ -221,6 +240,7 @@ def calculate_roc_auc(y_true: np.ndarray, y_scores: np.ndarray) -> float:
     """
     try:
         from sklearn.metrics import roc_auc_score
+
         auc = roc_auc_score(y_true, y_scores)
         logger.debug(f"Calculated ROC AUC: {auc:.4f}")
         return auc
@@ -233,8 +253,9 @@ def calculate_roc_auc(y_true: np.ndarray, y_scores: np.ndarray) -> float:
         return 0.5
 
 
-def plot_training_history(history: Dict[str, List[float]],
-                         save_path: Optional[str] = None) -> Optional[plt.Figure]:
+def plot_training_history(
+    history: Dict[str, List[float]], save_path: Optional[str] = None
+) -> Optional[plt.Figure]:
     """
     Plot training history (loss and accuracy curves).
 
@@ -259,36 +280,36 @@ def plot_training_history(history: Dict[str, List[float]],
         if not isinstance(history, dict):
             raise ValueError("History must be a dictionary")
 
-        required_keys = ['loss', 'accuracy']
+        required_keys = ["loss", "accuracy"]
         for key in required_keys:
             if key not in history:
                 raise ValueError(f"History missing required key: {key}")
 
-        epochs = range(1, len(history['loss']) + 1)
+        epochs = range(1, len(history["loss"]) + 1)
 
         # Create subplots
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
         # Plot loss
-        ax1.plot(epochs, history['loss'], 'b-', label='Training Loss')
-        ax1.set_title('Model Loss')
-        ax1.set_xlabel('Epoch')
-        ax1.set_ylabel('Loss')
+        ax1.plot(epochs, history["loss"], "b-", label="Training Loss")
+        ax1.set_title("Model Loss")
+        ax1.set_xlabel("Epoch")
+        ax1.set_ylabel("Loss")
         ax1.legend()
         ax1.grid(True, alpha=0.3)
 
         # Plot accuracy
-        ax2.plot(epochs, history['accuracy'], 'r-', label='Training Accuracy')
-        ax2.set_title('Model Accuracy')
-        ax2.set_xlabel('Epoch')
-        ax2.set_ylabel('Accuracy')
+        ax2.plot(epochs, history["accuracy"], "r-", label="Training Accuracy")
+        ax2.set_title("Model Accuracy")
+        ax2.set_xlabel("Epoch")
+        ax2.set_ylabel("Accuracy")
         ax2.legend()
         ax2.grid(True, alpha=0.3)
 
         plt.tight_layout()
 
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             logger.info(f"Training history plot saved to {save_path}")
 
         logger.debug("Generated training history plot")
@@ -299,8 +320,9 @@ def plot_training_history(history: Dict[str, List[float]],
         return None
 
 
-def calculate_recommendation_metrics(recommendations: List[Dict],
-                                   ground_truth: Optional[List[int]] = None) -> Dict[str, float]:
+def calculate_recommendation_metrics(
+    recommendations: List[Dict], ground_truth: Optional[List[int]] = None
+) -> Dict[str, float]:
     """
     Calculate metrics for recommendation system performance.
 
@@ -324,18 +346,19 @@ def calculate_recommendation_metrics(recommendations: List[Dict],
     """
     try:
         if not recommendations:
-            return {'count': 0, 'avg_confidence': 0.0}
+            return {"count": 0, "avg_confidence": 0.0}
 
         # Basic metrics
-        confidences = [rec.get('confidence', 0.0) for rec in recommendations]
+        confidences = [rec.get("confidence", 0.0) for rec in recommendations]
 
         metrics = {
-            'count': len(recommendations),
-            'avg_confidence': np.mean(confidences),
-            'max_confidence': np.max(confidences),
-            'min_confidence': np.min(confidences),
-            'std_confidence': np.std(confidences),
-            'high_confidence_ratio': sum(1 for c in confidences if c >= 0.7) / len(confidences)
+            "count": len(recommendations),
+            "avg_confidence": np.mean(confidences),
+            "max_confidence": np.max(confidences),
+            "min_confidence": np.min(confidences),
+            "std_confidence": np.std(confidences),
+            "high_confidence_ratio": sum(1 for c in confidences if c >= 0.7)
+            / len(confidences),
         }
 
         # If ground truth is provided, calculate precision@k
@@ -348,24 +371,30 @@ def calculate_recommendation_metrics(recommendations: List[Dict],
                     if k <= len(recommendations):
                         relevant_at_k = sum(ground_truth[:k])
                         precision_at_k = relevant_at_k / k
-                        metrics[f'precision_at_{k}'] = precision_at_k
+                        metrics[f"precision_at_{k}"] = precision_at_k
 
                 # Calculate NDCG@5 (simplified)
-                dcg = sum(rel / np.log2(i + 2) for i, rel in enumerate(ground_truth[:5]))
-                ideal_dcg = sum(1 / np.log2(i + 2) for i in range(min(5, sum(ground_truth))))
+                dcg = sum(
+                    rel / np.log2(i + 2) for i, rel in enumerate(ground_truth[:5])
+                )
+                ideal_dcg = sum(
+                    1 / np.log2(i + 2) for i in range(min(5, sum(ground_truth)))
+                )
                 ndcg = dcg / ideal_dcg if ideal_dcg > 0 else 0.0
-                metrics['ndcg_at_5'] = ndcg
+                metrics["ndcg_at_5"] = ndcg
 
         logger.debug(f"Calculated recommendation metrics: {metrics}")
         return metrics
 
     except Exception as e:
         logger.error(f"Error calculating recommendation metrics: {e}")
-        return {'count': 0, 'avg_confidence': 0.0}
+        return {"count": 0, "avg_confidence": 0.0}
 
 
-def calculate_hand_detection_metrics(detected_landmarks: List[Optional[Dict]],
-                                   ground_truth_landmarks: List[Optional[Dict]]) -> Dict[str, float]:
+def calculate_hand_detection_metrics(
+    detected_landmarks: List[Optional[Dict]],
+    ground_truth_landmarks: List[Optional[Dict]],
+) -> Dict[str, float]:
     """
     Calculate metrics for hand detection performance.
 
@@ -411,8 +440,10 @@ def calculate_hand_detection_metrics(detected_landmarks: List[Optional[Dict]],
             if has_gt and has_detection:
                 true_positives += 1
                 # Calculate landmark accuracy if both have landmarks
-                if 'landmarks' in detected and 'landmarks' in ground_truth:
-                    error = calculate_landmark_error(detected['landmarks'], ground_truth['landmarks'])
+                if "landmarks" in detected and "landmarks" in ground_truth:
+                    error = calculate_landmark_error(
+                        detected["landmarks"], ground_truth["landmarks"]
+                    )
                     if error is not None:
                         landmark_errors.append(error)
 
@@ -424,25 +455,33 @@ def calculate_hand_detection_metrics(detected_landmarks: List[Optional[Dict]],
                 false_negatives += 1
 
         # Calculate metrics
-        detection_rate = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
-        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
+        detection_rate = (
+            true_positives / (true_positives + false_negatives)
+            if (true_positives + false_negatives) > 0
+            else 0.0
+        )
+        precision = (
+            true_positives / (true_positives + false_positives)
+            if (true_positives + false_positives) > 0
+            else 0.0
+        )
         accuracy = (true_positives + true_negatives) / total_samples
 
         metrics = {
-            'detection_rate': detection_rate,
-            'precision': precision,
-            'accuracy': accuracy,
-            'true_positives': true_positives,
-            'false_positives': false_positives,
-            'true_negatives': true_negatives,
-            'false_negatives': false_negatives,
-            'total_samples': total_samples
+            "detection_rate": detection_rate,
+            "precision": precision,
+            "accuracy": accuracy,
+            "true_positives": true_positives,
+            "false_positives": false_positives,
+            "true_negatives": true_negatives,
+            "false_negatives": false_negatives,
+            "total_samples": total_samples,
         }
 
         # Add landmark accuracy if available
         if landmark_errors:
-            metrics['avg_landmark_error'] = np.mean(landmark_errors)
-            metrics['landmark_error_std'] = np.std(landmark_errors)
+            metrics["avg_landmark_error"] = np.mean(landmark_errors)
+            metrics["landmark_error_std"] = np.std(landmark_errors)
 
         logger.debug(f"Calculated hand detection metrics: {metrics}")
         return metrics
@@ -452,7 +491,9 @@ def calculate_hand_detection_metrics(detected_landmarks: List[Optional[Dict]],
         return {}
 
 
-def calculate_landmark_error(detected_landmarks: List[Dict], ground_truth_landmarks: List[Dict]) -> Optional[float]:
+def calculate_landmark_error(
+    detected_landmarks: List[Dict], ground_truth_landmarks: List[Dict]
+) -> Optional[float]:
     """
     Calculate average landmark position error.
 
@@ -474,10 +515,10 @@ def calculate_landmark_error(detected_landmarks: List[Dict], ground_truth_landma
 
         errors = []
         for detected, gt in zip(detected_landmarks, ground_truth_landmarks):
-            if 'x' in detected and 'y' in detected and 'x' in gt and 'y' in gt:
-                dx = detected['x'] - gt['x']
-                dy = detected['y'] - gt['y']
-                error = np.sqrt(dx*dx + dy*dy)
+            if "x" in detected and "y" in detected and "x" in gt and "y" in gt:
+                dx = detected["x"] - gt["x"]
+                dy = detected["y"] - gt["y"]
+                error = np.sqrt(dx * dx + dy * dy)
                 errors.append(error)
 
         return np.mean(errors) if errors else None
@@ -487,8 +528,9 @@ def calculate_landmark_error(detected_landmarks: List[Dict], ground_truth_landma
         return None
 
 
-def generate_performance_report(metrics: Dict[str, Union[float, int]],
-                              model_name: str = "Model") -> str:
+def generate_performance_report(
+    metrics: Dict[str, Union[float, int]], model_name: str = "Model"
+) -> str:
     """
     Generate a formatted performance report.
 
@@ -514,12 +556,12 @@ def generate_performance_report(metrics: Dict[str, Union[float, int]],
         report_lines = [
             f"Performance Report for {model_name}",
             "=" * (25 + len(model_name)),
-            ""
+            "",
         ]
 
         # Group metrics by category
-        accuracy_metrics = ['accuracy', 'precision', 'recall', 'f1', 'specificity']
-        detection_metrics = ['detection_rate', 'avg_confidence', 'ndcg_at_5']
+        accuracy_metrics = ["accuracy", "precision", "recall", "f1", "specificity"]
+        detection_metrics = ["detection_rate", "avg_confidence", "ndcg_at_5"]
 
         # Add accuracy metrics
         if any(metric in metrics for metric in accuracy_metrics):
@@ -528,9 +570,13 @@ def generate_performance_report(metrics: Dict[str, Union[float, int]],
                 if metric in metrics:
                     value = metrics[metric]
                     if isinstance(value, float):
-                        report_lines.append(f"  {metric.replace('_', ' ').title()}: {value:.3f}")
+                        report_lines.append(
+                            f"  {metric.replace('_', ' ').title()}: {value:.3f}"
+                        )
                     else:
-                        report_lines.append(f"  {metric.replace('_', ' ').title()}: {value}")
+                        report_lines.append(
+                            f"  {metric.replace('_', ' ').title()}: {value}"
+                        )
             report_lines.append("")
 
         # Add detection metrics
@@ -540,22 +586,33 @@ def generate_performance_report(metrics: Dict[str, Union[float, int]],
                 if metric in metrics:
                     value = metrics[metric]
                     if isinstance(value, float):
-                        report_lines.append(f"  {metric.replace('_', ' ').title()}: {value:.3f}")
+                        report_lines.append(
+                            f"  {metric.replace('_', ' ').title()}: {value:.3f}"
+                        )
                     else:
-                        report_lines.append(f"  {metric.replace('_', ' ').title()}: {value}")
+                        report_lines.append(
+                            f"  {metric.replace('_', ' ').title()}: {value}"
+                        )
             report_lines.append("")
 
         # Add other metrics
-        other_metrics = [k for k in metrics.keys()
-                        if k not in accuracy_metrics and k not in detection_metrics]
+        other_metrics = [
+            k
+            for k in metrics.keys()
+            if k not in accuracy_metrics and k not in detection_metrics
+        ]
         if other_metrics:
             report_lines.append("Other Metrics:")
             for metric in sorted(other_metrics):
                 value = metrics[metric]
                 if isinstance(value, float):
-                    report_lines.append(f"  {metric.replace('_', ' ').title()}: {value:.3f}")
+                    report_lines.append(
+                        f"  {metric.replace('_', ' ').title()}: {value:.3f}"
+                    )
                 else:
-                    report_lines.append(f"  {metric.replace('_', ' ').title()}: {value}")
+                    report_lines.append(
+                        f"  {metric.replace('_', ' ').title()}: {value}"
+                    )
 
         return "\n".join(report_lines)
 

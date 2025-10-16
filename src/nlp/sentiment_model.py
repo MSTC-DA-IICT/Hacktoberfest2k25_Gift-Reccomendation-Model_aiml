@@ -25,7 +25,7 @@ class LogisticRegression:
         """Initialize the logistic regression model."""
         self.weights: Optional[np.ndarray] = None
         self.bias: Optional[float] = None
-        self.history: Dict[str, List[float]] = {'loss': [], 'accuracy': []}
+        self.history: Dict[str, List[float]] = {"loss": [], "accuracy": []}
         self.is_fitted = False
 
     def sigmoid(self, z: np.ndarray) -> np.ndarray:
@@ -94,7 +94,9 @@ class LogisticRegression:
         y_pred_proba = np.clip(y_pred_proba, epsilon, 1 - epsilon)
 
         # Binary cross-entropy loss
-        loss = -np.mean(y_true * np.log(y_pred_proba) + (1 - y_true) * np.log(1 - y_pred_proba))
+        loss = -np.mean(
+            y_true * np.log(y_pred_proba) + (1 - y_true) * np.log(1 - y_pred_proba)
+        )
         return loss
 
     def compute_accuracy(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -115,10 +117,14 @@ class LogisticRegression:
         """
         return np.mean(y_true == y_pred)
 
-    def train(self, X: np.ndarray, y: np.ndarray,
-              learning_rate: float = 0.01,
-              epochs: int = 100,
-              verbose: bool = True) -> None:
+    def train(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        learning_rate: float = 0.01,
+        epochs: int = 100,
+        verbose: bool = True,
+    ) -> None:
         """
         Train the logistic regression model using gradient descent.
 
@@ -149,7 +155,9 @@ class LogisticRegression:
         """
         # Validate input
         if X.shape[0] != y.shape[0]:
-            raise ValueError(f"X and y must have same number of samples: {X.shape[0]} != {y.shape[0]}")
+            raise ValueError(
+                f"X and y must have same number of samples: {X.shape[0]} != {y.shape[0]}"
+            )
 
         n_samples, n_features = X.shape
 
@@ -157,10 +165,12 @@ class LogisticRegression:
         self.initialize_weights(n_features)
 
         # Reset history
-        self.history = {'loss': [], 'accuracy': []}
+        self.history = {"loss": [], "accuracy": []}
 
         if verbose:
-            logger.info(f"Starting training with {n_samples} samples, {n_features} features")
+            logger.info(
+                f"Starting training with {n_samples} samples, {n_features} features"
+            )
 
         # Training loop
         for epoch in range(epochs):
@@ -176,8 +186,8 @@ class LogisticRegression:
             accuracy = self.compute_accuracy(y, y_pred)
 
             # Store metrics
-            self.history['loss'].append(loss)
-            self.history['accuracy'].append(accuracy)
+            self.history["loss"].append(loss)
+            self.history["accuracy"].append(accuracy)
 
             # Backward pass - compute gradients
             dw = (1 / n_samples) * X.T.dot(y_pred_proba - y)
@@ -189,14 +199,18 @@ class LogisticRegression:
 
             # Print progress
             if verbose and (epoch + 1) % 20 == 0:
-                logger.info(f"Epoch {epoch + 1}/{epochs} - Loss: {loss:.4f}, Accuracy: {accuracy:.4f}")
+                logger.info(
+                    f"Epoch {epoch + 1}/{epochs} - Loss: {loss:.4f}, Accuracy: {accuracy:.4f}"
+                )
 
         self.is_fitted = True
 
         if verbose:
-            final_loss = self.history['loss'][-1]
-            final_accuracy = self.history['accuracy'][-1]
-            logger.info(f"Training completed - Final Loss: {final_loss:.4f}, Final Accuracy: {final_accuracy:.4f}")
+            final_loss = self.history["loss"][-1]
+            final_accuracy = self.history["accuracy"][-1]
+            logger.info(
+                f"Training completed - Final Loss: {final_loss:.4f}, Final Accuracy: {final_accuracy:.4f}"
+            )
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """
@@ -290,14 +304,14 @@ class LogisticRegression:
             raise ValueError("Cannot save untrained model")
 
         model_data = {
-            'weights': self.weights,
-            'bias': self.bias,
-            'history': self.history,
-            'is_fitted': self.is_fitted
+            "weights": self.weights,
+            "bias": self.bias,
+            "history": self.history,
+            "is_fitted": self.is_fitted,
         }
 
         try:
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 pickle.dump(model_data, f)
             logger.info(f"Model saved to {path}")
         except Exception as e:
@@ -319,13 +333,13 @@ class LogisticRegression:
             If model file doesn't exist
         """
         try:
-            with open(path, 'rb') as f:
+            with open(path, "rb") as f:
                 model_data = pickle.load(f)
 
-            self.weights = model_data['weights']
-            self.bias = model_data['bias']
-            self.history = model_data['history']
-            self.is_fitted = model_data['is_fitted']
+            self.weights = model_data["weights"]
+            self.bias = model_data["bias"]
+            self.history = model_data["history"]
+            self.is_fitted = model_data["is_fitted"]
 
             logger.info(f"Model loaded from {path}")
         except Exception as e:
@@ -366,8 +380,8 @@ class LogisticRegression:
         y_pred = self.predict(X)
 
         metrics = {
-            'accuracy': self.compute_accuracy(y, y_pred),
-            'loss': self.compute_loss(y, y_pred_proba),
+            "accuracy": self.compute_accuracy(y, y_pred),
+            "loss": self.compute_loss(y, y_pred_proba),
         }
 
         return metrics

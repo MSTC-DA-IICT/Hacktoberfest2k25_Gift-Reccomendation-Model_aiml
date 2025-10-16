@@ -30,7 +30,9 @@ class TestHandDetector:
 
     def test_detector_with_custom_confidence(self):
         """Test detector with custom confidence values."""
-        detector = HandDetector(min_detection_confidence=0.7, min_tracking_confidence=0.8)
+        detector = HandDetector(
+            min_detection_confidence=0.7, min_tracking_confidence=0.8
+        )
         assert detector.min_detection_confidence == 0.7
         assert detector.min_tracking_confidence == 0.8
 
@@ -70,7 +72,7 @@ class TestHandDetector:
         # Should return None when no hand is detected
         assert result is None
 
-    @patch('cv2.VideoCapture')
+    @patch("cv2.VideoCapture")
     def test_capture_from_webcam_no_camera(self, mock_video_capture):
         """Test webcam capture when camera is not available."""
         mock_cap = Mock()
@@ -80,7 +82,7 @@ class TestHandDetector:
         result = self.detector.capture_from_webcam(duration=1, show_preview=False)
         assert result is None
 
-    @patch('cv2.VideoCapture')
+    @patch("cv2.VideoCapture")
     def test_capture_from_webcam_mock(self, mock_video_capture):
         """Test webcam capture with mocked camera."""
         # Create mock camera
@@ -118,12 +120,12 @@ class TestHandDetector:
 
         # Create mock landmarks structure
         landmarks = {
-            'landmarks': [
-                {'x': 100, 'y': 200, 'z': 0.1},
-                {'x': 150, 'y': 250, 'z': 0.2}
+            "landmarks": [
+                {"x": 100, "y": 200, "z": 0.1},
+                {"x": 150, "y": 250, "z": 0.2},
             ],
-            'handedness': 'Right',
-            'confidence': 0.95
+            "handedness": "Right",
+            "confidence": 0.95,
         }
 
         result = self.detector.draw_landmarks(image, landmarks)
@@ -138,7 +140,12 @@ class TestHandDetector:
 
     def test_landmark_names_content(self):
         """Test that landmark names contain expected entries."""
-        expected_landmarks = ['WRIST', 'THUMB_TIP', 'INDEX_FINGER_TIP', 'MIDDLE_FINGER_TIP']
+        expected_landmarks = [
+            "WRIST",
+            "THUMB_TIP",
+            "INDEX_FINGER_TIP",
+            "MIDDLE_FINGER_TIP",
+        ]
 
         for landmark in expected_landmarks:
             assert landmark in self.detector.landmark_names
@@ -155,29 +162,31 @@ class TestHandDetector:
 
     def test_get_landmark_by_name_invalid(self):
         """Test getting landmark by invalid name."""
-        landmarks = {
-            'landmarks': [{'x': 100, 'y': 200, 'z': 0.1}] * 21
-        }
+        landmarks = {"landmarks": [{"x": 100, "y": 200, "z": 0.1}] * 21}
 
-        result = self.detector.get_landmark_by_name(landmarks, 'INVALID_LANDMARK')
+        result = self.detector.get_landmark_by_name(landmarks, "INVALID_LANDMARK")
         assert result is None
 
     def test_get_landmark_by_name_valid(self):
         """Test getting landmark by valid name."""
         landmarks = {
-            'landmarks': [{'x': i*10, 'y': i*20, 'z': i*0.1} for i in range(21)]
+            "landmarks": [{"x": i * 10, "y": i * 20, "z": i * 0.1} for i in range(21)]
         }
 
-        wrist = self.detector.get_landmark_by_name(landmarks, 'WRIST')
+        wrist = self.detector.get_landmark_by_name(landmarks, "WRIST")
         assert wrist is not None
-        assert wrist['x'] == 0
-        assert wrist['y'] == 0
+        assert wrist["x"] == 0
+        assert wrist["y"] == 0
 
     def test_confidence_range(self):
         """Test that confidence values are properly handled."""
         # Test with extreme values
-        detector1 = HandDetector(min_detection_confidence=0.0, min_tracking_confidence=0.0)
+        detector1 = HandDetector(
+            min_detection_confidence=0.0, min_tracking_confidence=0.0
+        )
         assert detector1.min_detection_confidence == 0.0
 
-        detector2 = HandDetector(min_detection_confidence=1.0, min_tracking_confidence=1.0)
+        detector2 = HandDetector(
+            min_detection_confidence=1.0, min_tracking_confidence=1.0
+        )
         assert detector2.min_detection_confidence == 1.0

@@ -37,20 +37,22 @@ class HandSizeEstimator:
 
         # MediaPipe landmark indices for key points
         self.landmark_indices = {
-            'wrist': 0,
-            'thumb_tip': 4,
-            'index_tip': 8,
-            'middle_tip': 12,
-            'ring_tip': 16,
-            'pinky_tip': 20,
-            'thumb_mcp': 2,
-            'index_mcp': 5,
-            'middle_mcp': 9,
-            'ring_mcp': 13,
-            'pinky_mcp': 17
+            "wrist": 0,
+            "thumb_tip": 4,
+            "index_tip": 8,
+            "middle_tip": 12,
+            "ring_tip": 16,
+            "pinky_tip": 20,
+            "thumb_mcp": 2,
+            "index_mcp": 5,
+            "middle_mcp": 9,
+            "ring_mcp": 13,
+            "pinky_mcp": 17,
         }
 
-        logger.info(f"HandSizeEstimator initialized with thresholds: small<={small_threshold}, medium<={medium_threshold}")
+        logger.info(
+            f"HandSizeEstimator initialized with thresholds: small<={small_threshold}, medium<={medium_threshold}"
+        )
 
     def calculate_distance(self, point1: Dict, point2: Dict) -> float:
         """
@@ -77,8 +79,8 @@ class HandSizeEstimator:
         >>> print(f"Distance: {distance:.2f}")
         """
         try:
-            dx = point2['x'] - point1['x']
-            dy = point2['y'] - point1['y']
+            dx = point2["x"] - point1["x"]
+            dy = point2["y"] - point1["y"]
             distance = math.sqrt(dx * dx + dy * dy)
             return distance
         except (KeyError, TypeError) as e:
@@ -106,21 +108,21 @@ class HandSizeEstimator:
         >>> print(finger_lengths)
         {'thumb': 85.4, 'index': 102.3, 'middle': 115.7, 'ring': 108.1, 'pinky': 78.9}
         """
-        if not landmarks_dict or 'landmarks' not in landmarks_dict:
+        if not landmarks_dict or "landmarks" not in landmarks_dict:
             return {}
 
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
 
         try:
             finger_lengths = {}
 
             # Calculate each finger length (tip to MCP)
             fingers = [
-                ('thumb', 'thumb_tip', 'thumb_mcp'),
-                ('index', 'index_tip', 'index_mcp'),
-                ('middle', 'middle_tip', 'middle_mcp'),
-                ('ring', 'ring_tip', 'ring_mcp'),
-                ('pinky', 'pinky_tip', 'pinky_mcp')
+                ("thumb", "thumb_tip", "thumb_mcp"),
+                ("index", "index_tip", "index_mcp"),
+                ("middle", "middle_tip", "middle_mcp"),
+                ("ring", "ring_tip", "ring_mcp"),
+                ("pinky", "pinky_tip", "pinky_mcp"),
             ]
 
             for finger_name, tip_name, mcp_name in fingers:
@@ -160,14 +162,14 @@ class HandSizeEstimator:
         >>> palm_width = estimator.calculate_palm_width(landmarks)
         >>> print(f"Palm width: {palm_width:.2f} pixels")
         """
-        if not landmarks_dict or 'landmarks' not in landmarks_dict:
+        if not landmarks_dict or "landmarks" not in landmarks_dict:
             return 0.0
 
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
 
         try:
-            thumb_mcp_idx = self.landmark_indices['thumb_mcp']
-            pinky_mcp_idx = self.landmark_indices['pinky_mcp']
+            thumb_mcp_idx = self.landmark_indices["thumb_mcp"]
+            pinky_mcp_idx = self.landmark_indices["pinky_mcp"]
 
             if thumb_mcp_idx < len(landmarks) and pinky_mcp_idx < len(landmarks):
                 thumb_mcp = landmarks[thumb_mcp_idx]
@@ -203,14 +205,14 @@ class HandSizeEstimator:
         >>> hand_span = estimator.calculate_hand_span(landmarks)
         >>> print(f"Hand span: {hand_span:.2f} pixels")
         """
-        if not landmarks_dict or 'landmarks' not in landmarks_dict:
+        if not landmarks_dict or "landmarks" not in landmarks_dict:
             return 0.0
 
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
 
         try:
-            thumb_tip_idx = self.landmark_indices['thumb_tip']
-            pinky_tip_idx = self.landmark_indices['pinky_tip']
+            thumb_tip_idx = self.landmark_indices["thumb_tip"]
+            pinky_tip_idx = self.landmark_indices["pinky_tip"]
 
             if thumb_tip_idx < len(landmarks) and pinky_tip_idx < len(landmarks):
                 thumb_tip = landmarks[thumb_tip_idx]
@@ -246,14 +248,14 @@ class HandSizeEstimator:
         >>> hand_length = estimator.calculate_hand_length(landmarks)
         >>> print(f"Hand length: {hand_length:.2f} pixels")
         """
-        if not landmarks_dict or 'landmarks' not in landmarks_dict:
+        if not landmarks_dict or "landmarks" not in landmarks_dict:
             return 0.0
 
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
 
         try:
-            wrist_idx = self.landmark_indices['wrist']
-            middle_tip_idx = self.landmark_indices['middle_tip']
+            wrist_idx = self.landmark_indices["wrist"]
+            middle_tip_idx = self.landmark_indices["middle_tip"]
 
             if wrist_idx < len(landmarks) and middle_tip_idx < len(landmarks):
                 wrist = landmarks[wrist_idx]
@@ -302,17 +304,17 @@ class HandSizeEstimator:
 
         try:
             # Basic measurements
-            measurements['palm_width'] = self.calculate_palm_width(landmarks_dict)
-            measurements['hand_span'] = self.calculate_hand_span(landmarks_dict)
-            measurements['hand_length'] = self.calculate_hand_length(landmarks_dict)
+            measurements["palm_width"] = self.calculate_palm_width(landmarks_dict)
+            measurements["hand_span"] = self.calculate_hand_span(landmarks_dict)
+            measurements["hand_length"] = self.calculate_hand_length(landmarks_dict)
 
             # Finger lengths
             finger_lengths = self.calculate_finger_length(landmarks_dict)
             measurements.update(finger_lengths)
 
             # Add middle finger length separately as it's often the primary measurement
-            if 'middle' in finger_lengths:
-                measurements['middle_finger_length'] = finger_lengths['middle']
+            if "middle" in finger_lengths:
+                measurements["middle_finger_length"] = finger_lengths["middle"]
 
             logger.debug(f"Calculated all measurements: {measurements}")
 
@@ -321,7 +323,9 @@ class HandSizeEstimator:
 
         return measurements
 
-    def classify_size(self, measurements: Dict[str, float], primary_metric: str = 'hand_length') -> str:
+    def classify_size(
+        self, measurements: Dict[str, float], primary_metric: str = "hand_length"
+    ) -> str:
         """
         Classify hand size based on measurements.
 
@@ -345,32 +349,37 @@ class HandSizeEstimator:
         >>> print(size)  # 'medium'
         """
         if not measurements or primary_metric not in measurements:
-            logger.warning(f"Primary metric '{primary_metric}' not found in measurements")
+            logger.warning(
+                f"Primary metric '{primary_metric}' not found in measurements"
+            )
             # Fallback to any available measurement
             if measurements:
                 primary_metric = next(iter(measurements))
             else:
-                return 'unknown'
+                return "unknown"
 
         try:
             primary_value = measurements[primary_metric]
 
             if primary_value <= self.small_threshold:
-                size = 'small'
+                size = "small"
             elif primary_value <= self.medium_threshold:
-                size = 'medium'
+                size = "medium"
             else:
-                size = 'large'
+                size = "large"
 
-            logger.info(f"Classified hand as '{size}' based on {primary_metric}={primary_value:.2f}")
+            logger.info(
+                f"Classified hand as '{size}' based on {primary_metric}={primary_value:.2f}"
+            )
             return size
 
         except Exception as e:
             logger.error(f"Error classifying hand size: {e}")
-            return 'unknown'
+            return "unknown"
 
-    def classify_size_multi_metric(self, measurements: Dict[str, float],
-                                   weights: Optional[Dict[str, float]] = None) -> Tuple[str, float]:
+    def classify_size_multi_metric(
+        self, measurements: Dict[str, float], weights: Optional[Dict[str, float]] = None
+    ) -> Tuple[str, float]:
         """
         Classify hand size using multiple metrics with weights.
 
@@ -394,19 +403,19 @@ class HandSizeEstimator:
         >>> print(f"Size: {size}, Confidence: {confidence:.2f}")
         """
         if not measurements:
-            return 'unknown', 0.0
+            return "unknown", 0.0
 
         # Default weights - hand_length is most reliable
         if weights is None:
             weights = {
-                'hand_length': 0.4,
-                'middle_finger_length': 0.3,
-                'palm_width': 0.2,
-                'hand_span': 0.1
+                "hand_length": 0.4,
+                "middle_finger_length": 0.3,
+                "palm_width": 0.2,
+                "hand_span": 0.1,
             }
 
         try:
-            weighted_scores = {'small': 0.0, 'medium': 0.0, 'large': 0.0}
+            weighted_scores = {"small": 0.0, "medium": 0.0, "large": 0.0}
             total_weight = 0.0
 
             for metric, value in measurements.items():
@@ -416,20 +425,32 @@ class HandSizeEstimator:
 
                     # Calculate scores for each size category
                     if value <= self.small_threshold:
-                        weighted_scores['small'] += weight * (1 - value / self.small_threshold)
-                        weighted_scores['medium'] += weight * (value / self.small_threshold * 0.5)
+                        weighted_scores["small"] += weight * (
+                            1 - value / self.small_threshold
+                        )
+                        weighted_scores["medium"] += weight * (
+                            value / self.small_threshold * 0.5
+                        )
                     elif value <= self.medium_threshold:
-                        small_distance = abs(value - self.small_threshold) / (self.medium_threshold - self.small_threshold)
-                        weighted_scores['small'] += weight * max(0, 1 - small_distance * 2)
-                        weighted_scores['medium'] += weight * (1 - small_distance)
-                        weighted_scores['large'] += weight * small_distance * 0.5
+                        small_distance = abs(value - self.small_threshold) / (
+                            self.medium_threshold - self.small_threshold
+                        )
+                        weighted_scores["small"] += weight * max(
+                            0, 1 - small_distance * 2
+                        )
+                        weighted_scores["medium"] += weight * (1 - small_distance)
+                        weighted_scores["large"] += weight * small_distance * 0.5
                     else:
-                        large_factor = min(1.0, (value - self.medium_threshold) / self.medium_threshold)
-                        weighted_scores['medium'] += weight * max(0, 1 - large_factor * 2)
-                        weighted_scores['large'] += weight * (1 - large_factor * 0.5)
+                        large_factor = min(
+                            1.0, (value - self.medium_threshold) / self.medium_threshold
+                        )
+                        weighted_scores["medium"] += weight * max(
+                            0, 1 - large_factor * 2
+                        )
+                        weighted_scores["large"] += weight * (1 - large_factor * 0.5)
 
             if total_weight == 0:
-                return 'unknown', 0.0
+                return "unknown", 0.0
 
             # Normalize scores
             for size in weighted_scores:
@@ -439,15 +460,18 @@ class HandSizeEstimator:
             best_size = max(weighted_scores, key=weighted_scores.get)
             confidence = weighted_scores[best_size]
 
-            logger.info(f"Multi-metric classification: {best_size} (confidence: {confidence:.3f})")
+            logger.info(
+                f"Multi-metric classification: {best_size} (confidence: {confidence:.3f})"
+            )
             return best_size, confidence
 
         except Exception as e:
             logger.error(f"Error in multi-metric classification: {e}")
-            return 'unknown', 0.0
+            return "unknown", 0.0
 
-    def estimate_real_world_size(self, measurements: Dict[str, float],
-                                 reference_distance: float = 60.0) -> Dict[str, float]:
+    def estimate_real_world_size(
+        self, measurements: Dict[str, float], reference_distance: float = 60.0
+    ) -> Dict[str, float]:
         """
         Estimate real-world hand measurements in centimeters.
 
@@ -499,27 +523,24 @@ class HandSizeEstimator:
             return {}
 
         stats = {
-            'measurements': measurements,
-            'primary_classification': self.classify_size(measurements),
-            'thresholds': {
-                'small_max': self.small_threshold,
-                'medium_max': self.medium_threshold
-            }
+            "measurements": measurements,
+            "primary_classification": self.classify_size(measurements),
+            "thresholds": {
+                "small_max": self.small_threshold,
+                "medium_max": self.medium_threshold,
+            },
         }
 
         # Multi-metric classification
         multi_size, confidence = self.classify_size_multi_metric(measurements)
-        stats['multi_metric'] = {
-            'classification': multi_size,
-            'confidence': confidence
-        }
+        stats["multi_metric"] = {"classification": multi_size, "confidence": confidence}
 
         # Size ratios relative to thresholds
-        if 'hand_length' in measurements:
-            hand_length = measurements['hand_length']
-            stats['size_ratios'] = {
-                'vs_small_threshold': hand_length / self.small_threshold,
-                'vs_medium_threshold': hand_length / self.medium_threshold
+        if "hand_length" in measurements:
+            hand_length = measurements["hand_length"]
+            stats["size_ratios"] = {
+                "vs_small_threshold": hand_length / self.small_threshold,
+                "vs_medium_threshold": hand_length / self.medium_threshold,
             }
 
         return stats

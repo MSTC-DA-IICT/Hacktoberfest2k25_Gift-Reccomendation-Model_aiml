@@ -53,16 +53,16 @@ class GiftDatabase:
             If config file is invalid
         """
         try:
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 data = json.load(f)
 
-            if 'gifts' not in data:
+            if "gifts" not in data:
                 raise ValueError("Config file must contain 'gifts' key")
 
-            self.gifts = data['gifts']
+            self.gifts = data["gifts"]
 
             # Create lookup dictionary by ID
-            self._gift_by_id = {gift['id']: gift for gift in self.gifts}
+            self._gift_by_id = {gift["id"]: gift for gift in self.gifts}
 
             # Validate gift data
             self._validate_gifts()
@@ -81,7 +81,14 @@ class GiftDatabase:
 
     def _validate_gifts(self) -> None:
         """Validate gift data structure."""
-        required_fields = ['id', 'name', 'category', 'hand_size', 'sentiment_min', 'sentiment_max']
+        required_fields = [
+            "id",
+            "name",
+            "category",
+            "hand_size",
+            "sentiment_min",
+            "sentiment_max",
+        ]
 
         for i, gift in enumerate(self.gifts):
             for field in required_fields:
@@ -89,12 +96,14 @@ class GiftDatabase:
                     raise ValueError(f"Gift {i} missing required field: {field}")
 
             # Validate sentiment range
-            if not (0 <= gift['sentiment_min'] <= gift['sentiment_max'] <= 1):
+            if not (0 <= gift["sentiment_min"] <= gift["sentiment_max"] <= 1):
                 raise ValueError(f"Gift {gift['id']} has invalid sentiment range")
 
             # Validate hand size
-            if gift['hand_size'] not in ['small', 'medium', 'large']:
-                raise ValueError(f"Gift {gift['id']} has invalid hand size: {gift['hand_size']}")
+            if gift["hand_size"] not in ["small", "medium", "large"]:
+                raise ValueError(
+                    f"Gift {gift['id']} has invalid hand size: {gift['hand_size']}"
+                )
 
     def get_all_gifts(self) -> List[Dict]:
         """
@@ -133,11 +142,11 @@ class GiftDatabase:
         >>> small_gifts = db.filter_by_size('small')
         >>> print(f"Found {len(small_gifts)} gifts for small hands")
         """
-        if size not in ['small', 'medium', 'large']:
+        if size not in ["small", "medium", "large"]:
             logger.warning(f"Invalid hand size: {size}")
             return []
 
-        filtered = [gift for gift in self.gifts if gift['hand_size'] == size]
+        filtered = [gift for gift in self.gifts if gift["hand_size"] == size]
         logger.debug(f"Found {len(filtered)} gifts for size '{size}'")
         return filtered
 
@@ -166,8 +175,9 @@ class GiftDatabase:
             return []
 
         filtered = [
-            gift for gift in self.gifts
-            if gift['sentiment_min'] <= sentiment <= gift['sentiment_max']
+            gift
+            for gift in self.gifts
+            if gift["sentiment_min"] <= sentiment <= gift["sentiment_max"]
         ]
         logger.debug(f"Found {len(filtered)} gifts for sentiment {sentiment:.2f}")
         return filtered
@@ -194,7 +204,7 @@ class GiftDatabase:
         >>> matches = db.filter_by_size_and_sentiment('medium', 0.7)
         >>> print(f"Found {len(matches)} matching gifts")
         """
-        if size not in ['small', 'medium', 'large']:
+        if size not in ["small", "medium", "large"]:
             logger.warning(f"Invalid hand size: {size}")
             return []
 
@@ -203,12 +213,17 @@ class GiftDatabase:
             return []
 
         filtered = [
-            gift for gift in self.gifts
-            if (gift['hand_size'] == size and
-                gift['sentiment_min'] <= sentiment <= gift['sentiment_max'])
+            gift
+            for gift in self.gifts
+            if (
+                gift["hand_size"] == size
+                and gift["sentiment_min"] <= sentiment <= gift["sentiment_max"]
+            )
         ]
 
-        logger.debug(f"Found {len(filtered)} gifts for size '{size}' and sentiment {sentiment:.2f}")
+        logger.debug(
+            f"Found {len(filtered)} gifts for size '{size}' and sentiment {sentiment:.2f}"
+        )
         return filtered
 
     def get_gift_by_id(self, gift_id: int) -> Optional[Dict]:
@@ -254,7 +269,7 @@ class GiftDatabase:
         >>> toys = db.filter_by_category('toy')
         >>> print(f"Found {len(toys)} toys")
         """
-        filtered = [gift for gift in self.gifts if gift['category'] == category]
+        filtered = [gift for gift in self.gifts if gift["category"] == category]
         logger.debug(f"Found {len(filtered)} gifts in category '{category}'")
         return filtered
 
@@ -286,9 +301,11 @@ class GiftDatabase:
 
         for gift in self.gifts:
             # Search in name and description
-            if (query_lower in gift['name'].lower() or
-                query_lower in gift.get('description', '').lower() or
-                query_lower in gift['category'].lower()):
+            if (
+                query_lower in gift["name"].lower()
+                or query_lower in gift.get("description", "").lower()
+                or query_lower in gift["category"].lower()
+            ):
                 matches.append(gift)
 
         logger.debug(f"Found {len(matches)} gifts matching query '{query}'")
@@ -324,26 +341,33 @@ class GiftDatabase:
         >>> db.add_gift(new_gift)
         """
         # Validate required fields
-        required_fields = ['id', 'name', 'category', 'hand_size', 'sentiment_min', 'sentiment_max']
+        required_fields = [
+            "id",
+            "name",
+            "category",
+            "hand_size",
+            "sentiment_min",
+            "sentiment_max",
+        ]
         for field in required_fields:
             if field not in gift:
                 raise ValueError(f"Gift missing required field: {field}")
 
         # Check if ID already exists
-        if gift['id'] in self._gift_by_id:
+        if gift["id"] in self._gift_by_id:
             raise ValueError(f"Gift with ID {gift['id']} already exists")
 
         # Validate sentiment range
-        if not (0 <= gift['sentiment_min'] <= gift['sentiment_max'] <= 1):
+        if not (0 <= gift["sentiment_min"] <= gift["sentiment_max"] <= 1):
             raise ValueError("Invalid sentiment range")
 
         # Validate hand size
-        if gift['hand_size'] not in ['small', 'medium', 'large']:
+        if gift["hand_size"] not in ["small", "medium", "large"]:
             raise ValueError(f"Invalid hand size: {gift['hand_size']}")
 
         # Add gift
         self.gifts.append(gift.copy())
-        self._gift_by_id[gift['id']] = gift.copy()
+        self._gift_by_id[gift["id"]] = gift.copy()
 
         logger.info(f"Added new gift: {gift['name']} (ID: {gift['id']})")
 
@@ -372,7 +396,7 @@ class GiftDatabase:
             return False
 
         # Remove from main list
-        self.gifts = [gift for gift in self.gifts if gift['id'] != gift_id]
+        self.gifts = [gift for gift in self.gifts if gift["id"] != gift_id]
 
         # Remove from lookup dict
         del self._gift_by_id[gift_id]
@@ -395,7 +419,7 @@ class GiftDatabase:
         >>> categories = db.get_categories()
         >>> print(f"Categories: {categories}")
         """
-        categories = list(set(gift['category'] for gift in self.gifts))
+        categories = list(set(gift["category"] for gift in self.gifts))
         return sorted(categories)
 
     def get_size_distribution(self) -> Dict[str, int]:
@@ -413,10 +437,10 @@ class GiftDatabase:
         >>> distribution = db.get_size_distribution()
         >>> print(distribution)  # {'small': 2, 'medium': 2, 'large': 2}
         """
-        distribution = {'small': 0, 'medium': 0, 'large': 0}
+        distribution = {"small": 0, "medium": 0, "large": 0}
 
         for gift in self.gifts:
-            size = gift['hand_size']
+            size = gift["hand_size"]
             if size in distribution:
                 distribution[size] += 1
 
@@ -437,13 +461,13 @@ class GiftDatabase:
         >>> stats = db.get_price_range_stats()
         >>> print(f"Price ranges: {stats['unique_ranges']}")
         """
-        price_ranges = [gift.get('price_range', 'N/A') for gift in self.gifts]
+        price_ranges = [gift.get("price_range", "N/A") for gift in self.gifts]
         unique_ranges = list(set(price_ranges))
 
         stats = {
-            'unique_ranges': sorted(unique_ranges),
-            'total_gifts': len(self.gifts),
-            'gifts_without_price': price_ranges.count('N/A')
+            "unique_ranges": sorted(unique_ranges),
+            "total_gifts": len(self.gifts),
+            "gifts_without_price": price_ranges.count("N/A"),
         }
 
         return stats
@@ -464,9 +488,9 @@ class GiftDatabase:
         >>> db.save_to_file('updated_gifts.json')
         """
         try:
-            data = {'gifts': self.gifts}
+            data = {"gifts": self.gifts}
 
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
             logger.info(f"Saved gift database to {output_path}")
@@ -491,18 +515,22 @@ class GiftDatabase:
         >>> print(f"Total gifts: {stats['total_gifts']}")
         """
         stats = {
-            'total_gifts': len(self.gifts),
-            'categories': self.get_categories(),
-            'size_distribution': self.get_size_distribution(),
-            'price_stats': self.get_price_range_stats()
+            "total_gifts": len(self.gifts),
+            "categories": self.get_categories(),
+            "size_distribution": self.get_size_distribution(),
+            "price_stats": self.get_price_range_stats(),
         }
 
         # Sentiment range statistics
-        sentiments = [(g['sentiment_min'], g['sentiment_max']) for g in self.gifts]
-        stats['sentiment_ranges'] = {
-            'min_sentiment': min(s[0] for s in sentiments) if sentiments else 0,
-            'max_sentiment': max(s[1] for s in sentiments) if sentiments else 1,
-            'avg_range_size': sum(s[1] - s[0] for s in sentiments) / len(sentiments) if sentiments else 0
+        sentiments = [(g["sentiment_min"], g["sentiment_max"]) for g in self.gifts]
+        stats["sentiment_ranges"] = {
+            "min_sentiment": min(s[0] for s in sentiments) if sentiments else 0,
+            "max_sentiment": max(s[1] for s in sentiments) if sentiments else 1,
+            "avg_range_size": (
+                sum(s[1] - s[0] for s in sentiments) / len(sentiments)
+                if sentiments
+                else 0
+            ),
         }
 
         return stats

@@ -24,19 +24,28 @@ class TextPreprocessor:
     def __init__(self):
         """Initialize the preprocessor with NLTK resources."""
         try:
-            nltk.data.find('tokenizers/punkt')
+            nltk.data.find("tokenizers/punkt")
         except LookupError:
-            nltk.download('punkt')
+            nltk.download("punkt")
 
         try:
-            nltk.data.find('corpora/stopwords')
+            nltk.data.find("corpora/stopwords")
         except LookupError:
-            nltk.download('stopwords')
+            nltk.download("stopwords")
 
-        self.stop_words = set(stopwords.words('english'))
+        self.stop_words = set(stopwords.words("english"))
 
         # Preserve some emotionally significant words that are typically stopwords
-        emotional_words = {'not', 'no', 'never', 'nothing', 'nowhere', 'neither', 'nobody', 'none'}
+        emotional_words = {
+            "not",
+            "no",
+            "never",
+            "nothing",
+            "nowhere",
+            "neither",
+            "nobody",
+            "none",
+        }
         self.stop_words = self.stop_words - emotional_words
 
     def clean_text(self, text: str) -> str:
@@ -66,25 +75,33 @@ class TextPreprocessor:
         text = text.lower()
 
         # Remove URLs
-        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
-        text = re.sub(r'www\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
+        text = re.sub(
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+            "",
+            text,
+        )
+        text = re.sub(
+            r"www\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+            "",
+            text,
+        )
 
         # Remove mentions (@username)
-        text = re.sub(r'@[A-Za-z0-9_]+', '', text)
+        text = re.sub(r"@[A-Za-z0-9_]+", "", text)
 
         # Remove hashtags but keep the content
-        text = re.sub(r'#([A-Za-z0-9_]+)', r'\\1', text)
+        text = re.sub(r"#([A-Za-z0-9_]+)", r"\\1", text)
 
         # Remove extra whitespace and newlines
-        text = re.sub(r'\\s+', ' ', text)
-        text = re.sub(r'\\n', ' ', text)
+        text = re.sub(r"\\s+", " ", text)
+        text = re.sub(r"\\n", " ", text)
 
         # Remove punctuation except for emotionally significant ones
         # Keep ! and ? as they can indicate sentiment
-        text = re.sub(r'[^\\w\\s!?]', ' ', text)
+        text = re.sub(r"[^\\w\\s!?]", " ", text)
 
         # Remove extra whitespace
-        text = re.sub(r'\\s+', ' ', text).strip()
+        text = re.sub(r"\\s+", " ", text).strip()
 
         return text
 
@@ -114,7 +131,9 @@ class TextPreprocessor:
         try:
             tokens = word_tokenize(text)
             # Filter out empty strings and single characters (except emotionally significant ones)
-            tokens = [token for token in tokens if len(token) > 1 or token in ['!', '?']]
+            tokens = [
+                token for token in tokens if len(token) > 1 or token in ["!", "?"]
+            ]
             return tokens
         except Exception:
             # Fallback to simple split if NLTK fails
@@ -145,8 +164,9 @@ class TextPreprocessor:
 
         # Filter out stopwords but keep emotionally significant punctuation
         filtered_tokens = [
-            token for token in tokens
-            if token.lower() not in self.stop_words or token in ['!', '?']
+            token
+            for token in tokens
+            if token.lower() not in self.stop_words or token in ["!", "?"]
         ]
 
         return filtered_tokens

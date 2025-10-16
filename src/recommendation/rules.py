@@ -12,18 +12,18 @@ logger = logging.getLogger(__name__)
 
 # Base mapping rules for recommendations
 GIFT_RULES = {
-    'small': {
-        'positive': ['toy', 'book', 'puzzle', 'art_supplies', 'jewelry'],
-        'negative': ['book', 'art_supplies', 'comfort_item', 'puzzle']
+    "small": {
+        "positive": ["toy", "book", "puzzle", "art_supplies", "jewelry"],
+        "negative": ["book", "art_supplies", "comfort_item", "puzzle"],
     },
-    'medium': {
-        'positive': ['accessory', 'gadget', 'sports', 'jewelry', 'watch'],
-        'negative': ['comfort_item', 'book', 'home_decor', 'pillow']
+    "medium": {
+        "positive": ["accessory", "gadget", "sports", "jewelry", "watch"],
+        "negative": ["comfort_item", "book", "home_decor", "pillow"],
     },
-    'large': {
-        'positive': ['jewelry', 'tech', 'sports', 'gadget', 'watch'],
-        'negative': ['appliance', 'tool', 'home_decor', 'comfort_item']
-    }
+    "large": {
+        "positive": ["jewelry", "tech", "sports", "gadget", "watch"],
+        "negative": ["appliance", "tool", "home_decor", "comfort_item"],
+    },
 }
 
 # Sentiment thresholds for positive/negative classification
@@ -31,38 +31,38 @@ SENTIMENT_THRESHOLD = 0.5
 
 # Category weights - higher values indicate better fit
 CATEGORY_WEIGHTS = {
-    'toy': {'small': 1.0, 'medium': 0.3, 'large': 0.1},
-    'book': {'small': 0.9, 'medium': 0.8, 'large': 0.7},
-    'puzzle': {'small': 0.8, 'medium': 0.6, 'large': 0.4},
-    'art_supplies': {'small': 0.9, 'medium': 0.7, 'large': 0.5},
-    'jewelry': {'small': 0.6, 'medium': 0.8, 'large': 1.0},
-    'accessory': {'small': 0.4, 'medium': 1.0, 'large': 0.8},
-    'gadget': {'small': 0.3, 'medium': 0.9, 'large': 1.0},
-    'sports': {'small': 0.2, 'medium': 0.8, 'large': 1.0},
-    'watch': {'small': 0.3, 'medium': 0.9, 'large': 0.8},
-    'comfort_item': {'small': 0.7, 'medium': 0.9, 'large': 0.8},
-    'home_decor': {'small': 0.3, 'medium': 0.8, 'large': 0.9},
-    'pillow': {'small': 0.6, 'medium': 0.9, 'large': 0.8},
-    'appliance': {'small': 0.1, 'medium': 0.4, 'large': 1.0},
-    'tool': {'small': 0.1, 'medium': 0.5, 'large': 1.0},
-    'tech': {'small': 0.4, 'medium': 0.8, 'large': 1.0},
-    'home': {'small': 0.3, 'medium': 0.8, 'large': 0.9}
+    "toy": {"small": 1.0, "medium": 0.3, "large": 0.1},
+    "book": {"small": 0.9, "medium": 0.8, "large": 0.7},
+    "puzzle": {"small": 0.8, "medium": 0.6, "large": 0.4},
+    "art_supplies": {"small": 0.9, "medium": 0.7, "large": 0.5},
+    "jewelry": {"small": 0.6, "medium": 0.8, "large": 1.0},
+    "accessory": {"small": 0.4, "medium": 1.0, "large": 0.8},
+    "gadget": {"small": 0.3, "medium": 0.9, "large": 1.0},
+    "sports": {"small": 0.2, "medium": 0.8, "large": 1.0},
+    "watch": {"small": 0.3, "medium": 0.9, "large": 0.8},
+    "comfort_item": {"small": 0.7, "medium": 0.9, "large": 0.8},
+    "home_decor": {"small": 0.3, "medium": 0.8, "large": 0.9},
+    "pillow": {"small": 0.6, "medium": 0.9, "large": 0.8},
+    "appliance": {"small": 0.1, "medium": 0.4, "large": 1.0},
+    "tool": {"small": 0.1, "medium": 0.5, "large": 1.0},
+    "tech": {"small": 0.4, "medium": 0.8, "large": 1.0},
+    "home": {"small": 0.3, "medium": 0.8, "large": 0.9},
 }
 
 # Age group approximations based on hand size (for context)
 AGE_APPROXIMATIONS = {
-    'small': 'child/teen',
-    'medium': 'young adult/adult',
-    'large': 'adult/large adult'
+    "small": "child/teen",
+    "medium": "young adult/adult",
+    "large": "adult/large adult",
 }
 
 # Sentiment-based gift personality mapping
 SENTIMENT_PERSONALITIES = {
-    'very_positive': (0.8, 1.0, 'enthusiastic, energetic'),
-    'positive': (0.6, 0.8, 'happy, optimistic'),
-    'neutral': (0.4, 0.6, 'balanced, practical'),
-    'negative': (0.2, 0.4, 'subdued, comfort-seeking'),
-    'very_negative': (0.0, 0.2, 'needs comfort, support')
+    "very_positive": (0.8, 1.0, "enthusiastic, energetic"),
+    "positive": (0.6, 0.8, "happy, optimistic"),
+    "neutral": (0.4, 0.6, "balanced, practical"),
+    "negative": (0.2, 0.4, "subdued, comfort-seeking"),
+    "very_negative": (0.0, 0.2, "needs comfort, support"),
 }
 
 
@@ -94,7 +94,9 @@ def get_category_priority(hand_size: str, sentiment: float) -> List[str]:
 
     try:
         # Determine sentiment category
-        sentiment_category = 'positive' if sentiment >= SENTIMENT_THRESHOLD else 'negative'
+        sentiment_category = (
+            "positive" if sentiment >= SENTIMENT_THRESHOLD else "negative"
+        )
 
         # Get base categories for this combination
         base_categories = GIFT_RULES[hand_size][sentiment_category]
@@ -111,7 +113,9 @@ def get_category_priority(hand_size: str, sentiment: float) -> List[str]:
         # Return ordered category list
         priorities = [category for category, _ in weighted_categories]
 
-        logger.debug(f"Category priorities for {hand_size}/{sentiment:.2f}: {priorities}")
+        logger.debug(
+            f"Category priorities for {hand_size}/{sentiment:.2f}: {priorities}"
+        )
         return priorities
 
     except Exception as e:
@@ -147,13 +151,17 @@ def calculate_category_score(category: str, hand_size: str, sentiment: float) ->
         base_score = CATEGORY_WEIGHTS.get(category, {}).get(hand_size, 0.5)
 
         # Adjust based on sentiment alignment
-        sentiment_category = 'positive' if sentiment >= SENTIMENT_THRESHOLD else 'negative'
+        sentiment_category = (
+            "positive" if sentiment >= SENTIMENT_THRESHOLD else "negative"
+        )
         size_categories = GIFT_RULES.get(hand_size, {})
 
         if category in size_categories.get(sentiment_category, []):
             # Category is in the preferred list for this sentiment
             sentiment_bonus = 0.2
-        elif category in size_categories.get('positive' if sentiment_category == 'negative' else 'negative', []):
+        elif category in size_categories.get(
+            "positive" if sentiment_category == "negative" else "negative", []
+        ):
             # Category is in the opposite sentiment list
             sentiment_penalty = -0.1
             base_score += sentiment_penalty
@@ -171,7 +179,9 @@ def calculate_category_score(category: str, hand_size: str, sentiment: float) ->
         # Ensure score is within valid range
         final_score = max(0.0, min(1.0, final_score))
 
-        logger.debug(f"Category '{category}' score for {hand_size}/{sentiment:.2f}: {final_score:.3f}")
+        logger.debug(
+            f"Category '{category}' score for {hand_size}/{sentiment:.2f}: {final_score:.3f}"
+        )
         return final_score
 
     except Exception as e:
@@ -204,7 +214,7 @@ def get_sentiment_personality(sentiment: float) -> Tuple[str, str]:
             return personality, description
 
     # Fallback
-    return 'neutral', 'balanced, practical'
+    return "neutral", "balanced, practical"
 
 
 def explain_recommendation_logic(gift: Dict, hand_size: str, sentiment: float) -> str:
@@ -232,14 +242,14 @@ def explain_recommendation_logic(gift: Dict, hand_size: str, sentiment: float) -
     This toy is perfect for small hands and matches your positive mood...
     """
     try:
-        category = gift.get('category', 'unknown')
-        gift_name = gift.get('name', 'Unknown Gift')
+        category = gift.get("category", "unknown")
+        gift_name = gift.get("name", "Unknown Gift")
 
         # Get personality info
         personality, personality_desc = get_sentiment_personality(sentiment)
 
         # Get age approximation
-        age_group = AGE_APPROXIMATIONS.get(hand_size, 'unknown age group')
+        age_group = AGE_APPROXIMATIONS.get(hand_size, "unknown age group")
 
         # Calculate category compatibility
         category_score = calculate_category_score(category, hand_size, sentiment)
@@ -256,7 +266,9 @@ def explain_recommendation_logic(gift: Dict, hand_size: str, sentiment: float) -
         elif sentiment >= 0.3:
             explanations.append(f"aligns with your balanced mood ({personality_desc})")
         else:
-            explanations.append(f"provides comfort for your current mood ({personality_desc})")
+            explanations.append(
+                f"provides comfort for your current mood ({personality_desc})"
+            )
 
         # Category compatibility
         if category_score >= 0.8:
@@ -267,7 +279,7 @@ def explain_recommendation_logic(gift: Dict, hand_size: str, sentiment: float) -
             explanations.append("and could be an interesting choice")
 
         # Price consideration
-        price_range = gift.get('price_range', 'Price varies')
+        price_range = gift.get("price_range", "Price varies")
         explanations.append(f"({price_range})")
 
         # Combine explanations
@@ -285,7 +297,9 @@ def explain_recommendation_logic(gift: Dict, hand_size: str, sentiment: float) -
         return f"Recommended based on your hand size and preferences."
 
 
-def get_alternative_categories(hand_size: str, sentiment: float, exclude_categories: List[str] = None) -> List[str]:
+def get_alternative_categories(
+    hand_size: str, sentiment: float, exclude_categories: List[str] = None
+) -> List[str]:
     """
     Get alternative categories when primary recommendations are not available.
 
@@ -324,7 +338,9 @@ def get_alternative_categories(hand_size: str, sentiment: float, exclude_categor
 
         # Sort by score (descending) and return categories
         scored_categories.sort(key=lambda x: x[1], reverse=True)
-        alternatives = [category for category, _ in scored_categories[:5]]  # Top 5 alternatives
+        alternatives = [
+            category for category, _ in scored_categories[:5]
+        ]  # Top 5 alternatives
 
         logger.debug(f"Found {len(alternatives)} alternative categories")
         return alternatives
@@ -334,8 +350,9 @@ def get_alternative_categories(hand_size: str, sentiment: float, exclude_categor
         return []
 
 
-def validate_gift_compatibility(gift: Dict, hand_size: str, sentiment: float,
-                               min_score: float = 0.3) -> Tuple[bool, float, str]:
+def validate_gift_compatibility(
+    gift: Dict, hand_size: str, sentiment: float, min_score: float = 0.3
+) -> Tuple[bool, float, str]:
     """
     Validate if a gift is compatible with given criteria.
 
@@ -362,23 +379,35 @@ def validate_gift_compatibility(gift: Dict, hand_size: str, sentiment: float,
     """
     try:
         # Check hand size match
-        gift_size = gift.get('hand_size', '')
+        gift_size = gift.get("hand_size", "")
         if gift_size != hand_size:
-            return False, 0.0, f"Hand size mismatch: gift is for {gift_size}, user has {hand_size}"
+            return (
+                False,
+                0.0,
+                f"Hand size mismatch: gift is for {gift_size}, user has {hand_size}",
+            )
 
         # Check sentiment range
-        sent_min = gift.get('sentiment_min', 0)
-        sent_max = gift.get('sentiment_max', 1)
+        sent_min = gift.get("sentiment_min", 0)
+        sent_max = gift.get("sentiment_max", 1)
         if not (sent_min <= sentiment <= sent_max):
-            return False, 0.0, f"Sentiment out of range: {sentiment:.2f} not in [{sent_min}, {sent_max}]"
+            return (
+                False,
+                0.0,
+                f"Sentiment out of range: {sentiment:.2f} not in [{sent_min}, {sent_max}]",
+            )
 
         # Calculate compatibility score
-        category = gift.get('category', '')
+        category = gift.get("category", "")
         score = calculate_category_score(category, hand_size, sentiment)
 
         # Check minimum score
         if score < min_score:
-            return False, score, f"Compatibility score {score:.2f} below minimum {min_score}"
+            return (
+                False,
+                score,
+                f"Compatibility score {score:.2f} below minimum {min_score}",
+            )
 
         # All checks passed
         return True, score, "Gift meets all compatibility criteria"
@@ -403,15 +432,16 @@ def get_recommendation_weights() -> Dict[str, float]:
     >>> print(f"Category weight: {weights['category_match']}")
     """
     return {
-        'category_match': 0.4,      # How well category fits hand size
-        'sentiment_alignment': 0.3,  # How well sentiment range matches
-        'exact_size_match': 0.2,    # Exact hand size match bonus
-        'popularity_boost': 0.1     # General popularity of item type
+        "category_match": 0.4,  # How well category fits hand size
+        "sentiment_alignment": 0.3,  # How well sentiment range matches
+        "exact_size_match": 0.2,  # Exact hand size match bonus
+        "popularity_boost": 0.1,  # General popularity of item type
     }
 
 
-def calculate_diversity_penalty(recommended_categories: List[str], new_category: str,
-                               penalty_factor: float = 0.1) -> float:
+def calculate_diversity_penalty(
+    recommended_categories: List[str], new_category: str, penalty_factor: float = 0.1
+) -> float:
     """
     Calculate penalty for recommending similar categories.
 

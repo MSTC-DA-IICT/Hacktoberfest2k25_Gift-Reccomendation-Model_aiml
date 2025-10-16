@@ -92,11 +92,7 @@ class TestTextPreprocessor:
 
     def test_preprocess_batch(self):
         """Test batch preprocessing."""
-        texts = [
-            "I love this!",
-            "This is terrible",
-            "Feeling great today"
-        ]
+        texts = ["I love this!", "This is terrible", "Feeling great today"]
         results = self.processor.preprocess_batch(texts)
 
         assert isinstance(results, list)

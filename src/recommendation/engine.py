@@ -9,8 +9,12 @@ from typing import Dict, List, Tuple, Optional, Any
 import logging
 from .gift_database import GiftDatabase
 from .rules import (
-    get_category_priority, calculate_category_score, explain_recommendation_logic,
-    validate_gift_compatibility, get_recommendation_weights, calculate_diversity_penalty
+    get_category_priority,
+    calculate_category_score,
+    explain_recommendation_logic,
+    validate_gift_compatibility,
+    get_recommendation_weights,
+    calculate_diversity_penalty,
 )
 
 logger = logging.getLogger(__name__)
@@ -39,10 +43,17 @@ class RecommendationEngine:
         self.min_confidence = min_confidence
         self.recommendation_weights = get_recommendation_weights()
 
-        logger.info(f"RecommendationEngine initialized with {len(self.gift_db.get_all_gifts())} gifts")
+        logger.info(
+            f"RecommendationEngine initialized with {len(self.gift_db.get_all_gifts())} gifts"
+        )
 
-    def recommend(self, sentiment: float, hand_size: str, max_results: int = 5,
-                 include_explanations: bool = True) -> List[Dict]:
+    def recommend(
+        self,
+        sentiment: float,
+        hand_size: str,
+        max_results: int = 5,
+        include_explanations: bool = True,
+    ) -> List[Dict]:
         """
         Generate gift recommendations.
 
@@ -70,7 +81,9 @@ class RecommendationEngine:
         ...     print(f"{rec['name']}: {rec['confidence']:.2f}")
         """
         try:
-            logger.info(f"Generating recommendations for sentiment={sentiment:.2f}, size={hand_size}")
+            logger.info(
+                f"Generating recommendations for sentiment={sentiment:.2f}, size={hand_size}"
+            )
 
             # Validate inputs
             if not self._validate_inputs(sentiment, hand_size):
@@ -93,16 +106,20 @@ class RecommendationEngine:
 
             # Filter by minimum confidence
             qualified_candidates = [
-                candidate for candidate in scored_candidates
-                if candidate['confidence'] >= self.min_confidence
+                candidate
+                for candidate in scored_candidates
+                if candidate["confidence"] >= self.min_confidence
             ]
 
             if not qualified_candidates:
-                logger.warning(f"No candidates meet minimum confidence {self.min_confidence}")
+                logger.warning(
+                    f"No candidates meet minimum confidence {self.min_confidence}"
+                )
                 # Lower threshold and try again
                 qualified_candidates = [
-                    candidate for candidate in scored_candidates
-                    if candidate['confidence'] >= self.min_confidence * 0.5
+                    candidate
+                    for candidate in scored_candidates
+                    if candidate["confidence"] >= self.min_confidence * 0.5
                 ]
 
             # Apply diversity filtering
@@ -114,7 +131,9 @@ class RecommendationEngine:
             # Add explanations if requested
             if include_explanations:
                 for rec in final_recommendations:
-                    rec['explanation'] = explain_recommendation_logic(rec, hand_size, sentiment)
+                    rec["explanation"] = explain_recommendation_logic(
+                        rec, hand_size, sentiment
+                    )
 
             logger.info(f"Generated {len(final_recommendations)} recommendations")
             return final_recommendations
@@ -129,7 +148,7 @@ class RecommendationEngine:
             logger.error(f"Invalid sentiment score: {sentiment}")
             return False
 
-        if hand_size not in ['small', 'medium', 'large']:
+        if hand_size not in ["small", "medium", "large"]:
             logger.error(f"Invalid hand size: {hand_size}")
             return False
 
@@ -157,7 +176,9 @@ class RecommendationEngine:
             logger.error(f"Error getting fallback candidates: {e}")
             return []
 
-    def _score_candidates(self, candidates: List[Dict], sentiment: float, hand_size: str) -> List[Dict]:
+    def _score_candidates(
+        self, candidates: List[Dict], sentiment: float, hand_size: str
+    ) -> List[Dict]:
         """Score and rank candidate gifts."""
         scored_candidates = []
 
@@ -167,14 +188,14 @@ class RecommendationEngine:
 
                 # Create recommendation object
                 recommendation = gift.copy()
-                recommendation['confidence'] = confidence
-                recommendation['sentiment_input'] = sentiment
-                recommendation['hand_size_input'] = hand_size
+                recommendation["confidence"] = confidence
+                recommendation["sentiment_input"] = sentiment
+                recommendation["hand_size_input"] = hand_size
 
                 scored_candidates.append(recommendation)
 
             # Sort by confidence (descending)
-            scored_candidates.sort(key=lambda x: x['confidence'], reverse=True)
+            scored_candidates.sort(key=lambda x: x["confidence"], reverse=True)
 
             logger.debug(f"Scored {len(scored_candidates)} candidates")
             return scored_candidates
@@ -183,7 +204,9 @@ class RecommendationEngine:
             logger.error(f"Error scoring candidates: {e}")
             return []
 
-    def calculate_confidence(self, gift: Dict, sentiment: float, hand_size: str) -> float:
+    def calculate_confidence(
+        self, gift: Dict, sentiment: float, hand_size: str
+    ) -> float:
         """
         Calculate confidence score for gift recommendation.
 
@@ -211,15 +234,15 @@ class RecommendationEngine:
             confidence_components = {}
 
             # 1. Hand size match (exact match gets full score)
-            if gift.get('hand_size') == hand_size:
+            if gift.get("hand_size") == hand_size:
                 size_score = 1.0
             else:
                 size_score = 0.0  # No partial credit for wrong size
-            confidence_components['size_match'] = size_score
+            confidence_components["size_match"] = size_score
 
             # 2. Sentiment alignment (how well sentiment fits range)
-            sent_min = gift.get('sentiment_min', 0)
-            sent_max = gift.get('sentiment_max', 1)
+            sent_min = gift.get("sentiment_min", 0)
+            sent_max = gift.get("sentiment_max", 1)
 
             if sent_min <= sentiment <= sent_max:
                 # Calculate how well centered the sentiment is in the range
@@ -229,34 +252,38 @@ class RecommendationEngine:
                 else:
                     range_center = (sent_min + sent_max) / 2
                     distance_from_center = abs(sentiment - range_center)
-                    sentiment_score = max(0.0, 1.0 - (distance_from_center / (range_size / 2)))
+                    sentiment_score = max(
+                        0.0, 1.0 - (distance_from_center / (range_size / 2))
+                    )
             else:
                 sentiment_score = 0.0
 
-            confidence_components['sentiment_alignment'] = sentiment_score
+            confidence_components["sentiment_alignment"] = sentiment_score
 
             # 3. Category compatibility
-            category = gift.get('category', '')
+            category = gift.get("category", "")
             category_score = calculate_category_score(category, hand_size, sentiment)
-            confidence_components['category_match'] = category_score
+            confidence_components["category_match"] = category_score
 
             # 4. Calculate weighted final score
             weights = self.recommendation_weights
             final_confidence = (
-                weights['exact_size_match'] * size_score +
-                weights['sentiment_alignment'] * sentiment_score +
-                weights['category_match'] * category_score
+                weights["exact_size_match"] * size_score
+                + weights["sentiment_alignment"] * sentiment_score
+                + weights["category_match"] * category_score
             )
 
             # Add small popularity boost (could be enhanced with actual popularity data)
-            popularity_boost = weights.get('popularity_boost', 0.0)
+            popularity_boost = weights.get("popularity_boost", 0.0)
             final_confidence += popularity_boost
 
             # Ensure score is within valid range
             final_confidence = max(0.0, min(1.0, final_confidence))
 
-            logger.debug(f"Confidence for {gift.get('name', 'Unknown')}: {final_confidence:.3f} "
-                        f"(components: {confidence_components})")
+            logger.debug(
+                f"Confidence for {gift.get('name', 'Unknown')}: {final_confidence:.3f} "
+                f"(components: {confidence_components})"
+            )
 
             return final_confidence
 
@@ -271,31 +298,35 @@ class RecommendationEngine:
             used_categories = []
 
             for candidate in candidates:
-                category = candidate.get('category', 'unknown')
+                category = candidate.get("category", "unknown")
 
                 # Calculate diversity penalty
                 penalty = calculate_diversity_penalty(used_categories, category)
 
                 # Apply penalty to confidence
-                original_confidence = candidate['confidence']
+                original_confidence = candidate["confidence"]
                 adjusted_confidence = max(0.0, original_confidence - penalty)
-                candidate['confidence'] = adjusted_confidence
-                candidate['diversity_penalty'] = penalty
+                candidate["confidence"] = adjusted_confidence
+                candidate["diversity_penalty"] = penalty
 
                 diverse_candidates.append(candidate)
                 used_categories.append(category)
 
             # Re-sort by adjusted confidence
-            diverse_candidates.sort(key=lambda x: x['confidence'], reverse=True)
+            diverse_candidates.sort(key=lambda x: x["confidence"], reverse=True)
 
-            logger.debug(f"Applied diversity filtering to {len(diverse_candidates)} candidates")
+            logger.debug(
+                f"Applied diversity filtering to {len(diverse_candidates)} candidates"
+            )
             return diverse_candidates
 
         except Exception as e:
             logger.error(f"Error applying diversity filtering: {e}")
             return candidates
 
-    def explain_recommendation(self, gift: Dict, sentiment: float, hand_size: str) -> str:
+    def explain_recommendation(
+        self, gift: Dict, sentiment: float, hand_size: str
+    ) -> str:
         """
         Generate detailed explanation for a recommendation.
 
@@ -336,7 +367,9 @@ class RecommendationEngine:
             logger.error(f"Error generating explanation: {e}")
             return "Recommended based on your preferences."
 
-    def get_recommendation_summary(self, sentiment: float, hand_size: str) -> Dict[str, Any]:
+    def get_recommendation_summary(
+        self, sentiment: float, hand_size: str
+    ) -> Dict[str, Any]:
         """
         Get summary statistics about recommendations for given inputs.
 
@@ -363,35 +396,38 @@ class RecommendationEngine:
 
             # Get all candidates
             candidates = self.gift_db.filter_by_size_and_sentiment(hand_size, sentiment)
-            summary['total_candidates'] = len(candidates)
+            summary["total_candidates"] = len(candidates)
 
             # Category distribution
-            categories = [gift.get('category', 'unknown') for gift in candidates]
+            categories = [gift.get("category", "unknown") for gift in candidates]
             category_counts = {}
             for category in categories:
                 category_counts[category] = category_counts.get(category, 0) + 1
-            summary['category_distribution'] = category_counts
+            summary["category_distribution"] = category_counts
 
             # Get priority categories
             priority_categories = get_category_priority(hand_size, sentiment)
-            summary['priority_categories'] = priority_categories[:3]  # Top 3
+            summary["priority_categories"] = priority_categories[:3]  # Top 3
 
             # Average confidence
             if candidates:
-                confidences = [self.calculate_confidence(gift, sentiment, hand_size) for gift in candidates]
-                summary['average_confidence'] = sum(confidences) / len(confidences)
-                summary['max_confidence'] = max(confidences)
-                summary['min_confidence'] = min(confidences)
+                confidences = [
+                    self.calculate_confidence(gift, sentiment, hand_size)
+                    for gift in candidates
+                ]
+                summary["average_confidence"] = sum(confidences) / len(confidences)
+                summary["max_confidence"] = max(confidences)
+                summary["min_confidence"] = min(confidences)
             else:
-                summary['average_confidence'] = 0.0
-                summary['max_confidence'] = 0.0
-                summary['min_confidence'] = 0.0
+                summary["average_confidence"] = 0.0
+                summary["max_confidence"] = 0.0
+                summary["min_confidence"] = 0.0
 
             # Input analysis
-            summary['input_analysis'] = {
-                'sentiment_category': 'positive' if sentiment >= 0.5 else 'negative',
-                'sentiment_strength': abs(sentiment - 0.5) * 2,
-                'hand_size': hand_size
+            summary["input_analysis"] = {
+                "sentiment_category": "positive" if sentiment >= 0.5 else "negative",
+                "sentiment_strength": abs(sentiment - 0.5) * 2,
+                "hand_size": hand_size,
             }
 
             return summary
@@ -428,23 +464,25 @@ class RecommendationEngine:
             for i, request in enumerate(requests):
                 logger.info(f"Processing batch request {i+1}/{len(requests)}")
 
-                sentiment = request.get('sentiment')
-                hand_size = request.get('hand_size')
-                max_results = request.get('max_results', 5)
+                sentiment = request.get("sentiment")
+                hand_size = request.get("hand_size")
+                max_results = request.get("max_results", 5)
 
                 if sentiment is None or hand_size is None:
                     logger.error(f"Invalid request {i}: missing sentiment or hand_size")
-                    results.append({'error': 'Missing required parameters', 'recommendations': []})
+                    results.append(
+                        {"error": "Missing required parameters", "recommendations": []}
+                    )
                     continue
 
                 recommendations = self.recommend(sentiment, hand_size, max_results)
 
                 result = {
-                    'request_id': i,
-                    'sentiment': sentiment,
-                    'hand_size': hand_size,
-                    'recommendations': recommendations,
-                    'count': len(recommendations)
+                    "request_id": i,
+                    "sentiment": sentiment,
+                    "hand_size": hand_size,
+                    "recommendations": recommendations,
+                    "count": len(recommendations),
                 }
                 results.append(result)
 
@@ -477,7 +515,9 @@ class RecommendationEngine:
 
             # Update weights
             self.recommendation_weights.update(new_weights)
-            logger.info(f"Updated recommendation weights: {self.recommendation_weights}")
+            logger.info(
+                f"Updated recommendation weights: {self.recommendation_weights}"
+            )
 
         except Exception as e:
             logger.error(f"Error updating weights: {e}")
@@ -493,10 +533,10 @@ class RecommendationEngine:
         """
         try:
             stats = {
-                'total_gifts': len(self.gift_db.get_all_gifts()),
-                'min_confidence_threshold': self.min_confidence,
-                'recommendation_weights': self.recommendation_weights.copy(),
-                'database_stats': self.gift_db.get_statistics()
+                "total_gifts": len(self.gift_db.get_all_gifts()),
+                "min_confidence_threshold": self.min_confidence,
+                "recommendation_weights": self.recommendation_weights.copy(),
+                "database_stats": self.gift_db.get_statistics(),
             }
 
             return stats
