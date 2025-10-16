@@ -396,6 +396,38 @@ def analyze_database(gifts: List[Dict], logger) -> Dict:
     except Exception as e:
         logger.error(f"Error analyzing database: {e}")
         return {}
+    
+def get_filtered_gifts(gifts: List[Dict], category: str, logger) -> List[Dict]:
+    """
+    Filter a list of gifts by a specific category.
+
+    Parameters
+    ----------
+    gifts : List[Dict]
+        The list of gift dictionaries to filter.
+    category : str
+        The category to filter by (case-insensitive).
+    logger : logging.Logger
+        The logger instance for logging messages.
+
+    Returns
+    -------
+    List[Dict]
+        A new list containing only the gifts that match the category.
+    """
+    logger.info(f"Filtering database for category: '{category}'")
+    
+    # Use a list comprehension for efficient and readable filtering
+    filtered_list = [
+        gift for gift in gifts 
+        if gift.get('category', '').lower() == category.lower()
+    ]
+    
+    original_count = len(gifts)
+    filtered_count = len(filtered_list)
+    logger.info(f"Filtered {original_count} gifts down to {filtered_count}.")
+    
+    return filtered_list
 
 def main():
     parser = argparse.ArgumentParser(
@@ -420,7 +452,11 @@ def main():
         action='store_true',
         help='Enable verbose logging'
     )
-
+    parser.add_argument(
+        '--filter-category',
+        type=str,
+        help='Filter gifts by a specific category'
+    )
     args = parser.parse_args()
 
     # Setup logging
@@ -526,6 +562,11 @@ def main():
                 data = json.load(f)
 
             gifts = data.get('gifts', [])
+            if args.filter_category:
+                gifts = get_filtered_gifts(gifts, args.filter_category, logger)
+                if not gifts:
+                    logger.warning(f"No gifts found in category '{args.filter_category}'")
+                    return 0
             stats = analyze_database(gifts, logger)
 
             # Print detailed analysis
