@@ -11,8 +11,9 @@ from typing import Optional
 import yaml
 
 
-def setup_logger(name: str, config_path: str = "config/config.yaml",
-                log_file: Optional[str] = None) -> logging.Logger:
+def setup_logger(
+    name: str, config_path: str = "config/config.yaml", log_file: Optional[str] = None
+) -> logging.Logger:
     """
     Set up logger with configuration from YAML file.
 
@@ -38,16 +39,16 @@ def setup_logger(name: str, config_path: str = "config/config.yaml",
     try:
         # Load configuration
         if os.path.exists(config_path):
-            with open(config_path, 'r') as f:
+            with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
 
-            logging_config = config.get('logging', {})
+            logging_config = config.get("logging", {})
         else:
             # Default configuration if file not found
             logging_config = {
-                'level': 'INFO',
-                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                'file': 'logs/app.log'
+                "level": "INFO",
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "file": "logs/app.log",
             }
 
         # Create logger
@@ -58,13 +59,14 @@ def setup_logger(name: str, config_path: str = "config/config.yaml",
             logger.removeHandler(handler)
 
         # Set level
-        level_str = logging_config.get('level', 'INFO')
+        level_str = logging_config.get("level", "INFO")
         level = getattr(logging, level_str.upper(), logging.INFO)
         logger.setLevel(level)
 
         # Create formatter
-        format_str = logging_config.get('format',
-                                       '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        format_str = logging_config.get(
+            "format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         formatter = logging.Formatter(format_str)
 
         # Console handler
@@ -74,16 +76,14 @@ def setup_logger(name: str, config_path: str = "config/config.yaml",
         logger.addHandler(console_handler)
 
         # File handler
-        log_file_path = log_file or logging_config.get('file', 'logs/app.log')
+        log_file_path = log_file or logging_config.get("file", "logs/app.log")
         if log_file_path:
             # Create logs directory if it doesn't exist
             os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
 
             # Use rotating file handler to prevent large log files
             file_handler = logging.handlers.RotatingFileHandler(
-                log_file_path,
-                maxBytes=10*1024*1024,  # 10MB
-                backupCount=5
+                log_file_path, maxBytes=10 * 1024 * 1024, backupCount=5  # 10MB
             )
             file_handler.setLevel(level)
             file_handler.setFormatter(formatter)
@@ -101,9 +101,11 @@ def setup_logger(name: str, config_path: str = "config/config.yaml",
 
         if not logger.handlers:
             handler = logging.StreamHandler()
-            handler.setFormatter(logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            ))
+            handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
             logger.addHandler(handler)
 
         logger.error(f"Error setting up logger: {e}")
@@ -141,7 +143,7 @@ class LoggerMixin:
     @property
     def logger(self) -> logging.Logger:
         """Get logger for this class."""
-        if not hasattr(self, '_logger'):
+        if not hasattr(self, "_logger"):
             self._logger = setup_logger(self.__class__.__name__)
         return self._logger
 
@@ -172,7 +174,9 @@ def log_execution_time(func):
             return result
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(f"{func.__name__} failed after {execution_time:.3f} seconds: {e}")
+            logger.error(
+                f"{func.__name__} failed after {execution_time:.3f} seconds: {e}"
+            )
             raise
 
     return wrapper
@@ -188,11 +192,11 @@ def configure_third_party_loggers(level: str = "WARNING") -> None:
         Log level for third-party loggers
     """
     third_party_loggers = [
-        'urllib3.connectionpool',
-        'requests.packages.urllib3',
-        'matplotlib',
-        'PIL',
-        'cv2'
+        "urllib3.connectionpool",
+        "requests.packages.urllib3",
+        "matplotlib",
+        "PIL",
+        "cv2",
     ]
 
     log_level = getattr(logging, level.upper(), logging.WARNING)

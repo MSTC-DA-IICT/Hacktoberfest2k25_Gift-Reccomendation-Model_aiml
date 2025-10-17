@@ -22,7 +22,14 @@ class Word2VecEmbeddings:
     text tokens into dense vector representations.
     """
 
-    def __init__(self, vector_size: int = 100, window: int = 5, min_count: int = 2, workers: int = 4, epochs: int = 10):
+    def __init__(
+        self,
+        vector_size: int = 100,
+        window: int = 5,
+        min_count: int = 2,
+        workers: int = 4,
+        epochs: int = 10,
+    ):
         """
         Initialize Word2Vec embeddings.
 
@@ -75,7 +82,7 @@ class Word2VecEmbeddings:
                 workers=self.workers,
                 epochs=self.epochs,
                 sg=0,  # Use CBOW
-                seed=42  # For reproducibility
+                seed=42,  # For reproducibility
             )
             self._is_trained = True
             logger.info("Word2Vec training completed successfully")
@@ -202,21 +209,21 @@ class Word2VecEmbeddings:
 
         try:
             # Save the gensim model
-            model_path = path if path.endswith('.model') else f"{path}.model"
+            model_path = path if path.endswith(".model") else f"{path}.model"
             self.model.save(model_path)
 
             # Save metadata
             metadata = {
-                'vector_size': self.vector_size,
-                'window': self.window,
-                'min_count': self.min_count,
-                'workers': self.workers,
-                'epochs': self.epochs,
-                'is_trained': self._is_trained
+                "vector_size": self.vector_size,
+                "window": self.window,
+                "min_count": self.min_count,
+                "workers": self.workers,
+                "epochs": self.epochs,
+                "is_trained": self._is_trained,
             }
 
-            metadata_path = path.replace('.model', '_metadata.pkl')
-            with open(metadata_path, 'wb') as f:
+            metadata_path = path.replace(".model", "_metadata.pkl")
+            with open(metadata_path, "wb") as f:
                 pickle.dump(metadata, f)
 
             logger.info(f"Model saved to {model_path}")
@@ -241,21 +248,21 @@ class Word2VecEmbeddings:
         """
         try:
             # Load the gensim model
-            model_path = path if path.endswith('.model') else f"{path}.model"
+            model_path = path if path.endswith(".model") else f"{path}.model"
             self.model = Word2Vec.load(model_path)
 
             # Load metadata
-            metadata_path = path.replace('.model', '_metadata.pkl')
+            metadata_path = path.replace(".model", "_metadata.pkl")
             try:
-                with open(metadata_path, 'rb') as f:
+                with open(metadata_path, "rb") as f:
                     metadata = pickle.load(f)
 
-                self.vector_size = metadata['vector_size']
-                self.window = metadata['window']
-                self.min_count = metadata['min_count']
-                self.workers = metadata['workers']
-                self.epochs = metadata['epochs']
-                self._is_trained = metadata['is_trained']
+                self.vector_size = metadata["vector_size"]
+                self.window = metadata["window"]
+                self.min_count = metadata["min_count"]
+                self.workers = metadata["workers"]
+                self.epochs = metadata["epochs"]
+                self._is_trained = metadata["is_trained"]
 
             except FileNotFoundError:
                 # If no metadata, infer from loaded model

@@ -23,7 +23,11 @@ class HandDetector:
     landmark coordinates for further analysis.
     """
 
-    def __init__(self, min_detection_confidence: float = 0.5, min_tracking_confidence: float = 0.5):
+    def __init__(
+        self,
+        min_detection_confidence: float = 0.5,
+        min_tracking_confidence: float = 0.5,
+    ):
         """
         Initialize the hand detector.
 
@@ -43,18 +47,33 @@ class HandDetector:
             static_image_mode=False,
             max_num_hands=2,
             min_detection_confidence=min_detection_confidence,
-            min_tracking_confidence=min_tracking_confidence
+            min_tracking_confidence=min_tracking_confidence,
         )
         self.mp_drawing = mp.solutions.drawing_utils
 
         # Hand landmark names for reference
         self.landmark_names = [
-            'WRIST',
-            'THUMB_CMC', 'THUMB_MCP', 'THUMB_IP', 'THUMB_TIP',
-            'INDEX_FINGER_MCP', 'INDEX_FINGER_PIP', 'INDEX_FINGER_DIP', 'INDEX_FINGER_TIP',
-            'MIDDLE_FINGER_MCP', 'MIDDLE_FINGER_PIP', 'MIDDLE_FINGER_DIP', 'MIDDLE_FINGER_TIP',
-            'RING_FINGER_MCP', 'RING_FINGER_PIP', 'RING_FINGER_DIP', 'RING_FINGER_TIP',
-            'PINKY_MCP', 'PINKY_PIP', 'PINKY_DIP', 'PINKY_TIP'
+            "WRIST",
+            "THUMB_CMC",
+            "THUMB_MCP",
+            "THUMB_IP",
+            "THUMB_TIP",
+            "INDEX_FINGER_MCP",
+            "INDEX_FINGER_PIP",
+            "INDEX_FINGER_DIP",
+            "INDEX_FINGER_TIP",
+            "MIDDLE_FINGER_MCP",
+            "MIDDLE_FINGER_PIP",
+            "MIDDLE_FINGER_DIP",
+            "MIDDLE_FINGER_TIP",
+            "RING_FINGER_MCP",
+            "RING_FINGER_PIP",
+            "RING_FINGER_DIP",
+            "RING_FINGER_TIP",
+            "PINKY_MCP",
+            "PINKY_PIP",
+            "PINKY_DIP",
+            "PINKY_TIP",
         ]
 
         logger.info("HandDetector initialized successfully")
@@ -137,7 +156,7 @@ class HandDetector:
                 x = int(landmark.x * width)
                 y = int(landmark.y * height)
                 z = landmark.z  # Depth (relative to wrist)
-                landmarks.append({'x': x, 'y': y, 'z': z})
+                landmarks.append({"x": x, "y": y, "z": z})
 
             # Get hand classification (Left/Right)
             handedness = "Unknown"
@@ -145,10 +164,14 @@ class HandDetector:
                 handedness = results.multi_handedness[0].classification[0].label
 
             landmark_dict = {
-                'landmarks': landmarks,
-                'handedness': handedness,
-                'image_shape': (height, width),
-                'confidence': results.multi_handedness[0].classification[0].score if results.multi_handedness else 0.0
+                "landmarks": landmarks,
+                "handedness": handedness,
+                "image_shape": (height, width),
+                "confidence": (
+                    results.multi_handedness[0].classification[0].score
+                    if results.multi_handedness
+                    else 0.0
+                ),
             }
 
             logger.debug(f"Extracted {len(landmarks)} landmarks from {handedness} hand")
@@ -158,7 +181,9 @@ class HandDetector:
             logger.error(f"Error extracting landmarks: {e}")
             return None
 
-    def get_landmark_by_name(self, landmarks_dict: Dict, landmark_name: str) -> Optional[Dict]:
+    def get_landmark_by_name(
+        self, landmarks_dict: Dict, landmark_name: str
+    ) -> Optional[Dict]:
         """
         Get specific landmark by name.
 
@@ -185,11 +210,13 @@ class HandDetector:
 
         try:
             index = self.landmark_names.index(landmark_name)
-            return landmarks_dict['landmarks'][index]
+            return landmarks_dict["landmarks"][index]
         except (IndexError, KeyError):
             return None
 
-    def capture_from_webcam(self, duration: int = 5, show_preview: bool = True) -> Optional[np.ndarray]:
+    def capture_from_webcam(
+        self, duration: int = 5, show_preview: bool = True
+    ) -> Optional[np.ndarray]:
         """
         Capture hand image from webcam.
 
@@ -218,7 +245,9 @@ class HandDetector:
             logger.error("Could not open webcam")
             return None
 
-        logger.info(f"Starting webcam capture. Looking for stable hand detection for {duration} seconds...")
+        logger.info(
+            f"Starting webcam capture. Looking for stable hand detection for {duration} seconds..."
+        )
 
         start_time = time.time()
         best_image = None
@@ -250,7 +279,10 @@ class HandDetector:
                     annotated_frame = frame.copy()
                     for hand_landmarks in results.multi_hand_landmarks:
                         self.mp_drawing.draw_landmarks(
-                            annotated_frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+                            annotated_frame,
+                            hand_landmarks,
+                            self.mp_hands.HAND_CONNECTIONS,
+                        )
 
                     # Check if this is a good detection
                     if confidence > self.min_detection_confidence:
@@ -262,21 +294,39 @@ class HandDetector:
                             best_image = frame.copy()
 
                         # Add confidence text
-                        cv2.putText(annotated_frame, f'Confidence: {confidence:.2f}',
-                                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                        cv2.putText(annotated_frame, f'Stable: {stable_detections}/{required_stable_detections}',
-                                    (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        cv2.putText(
+                            annotated_frame,
+                            f"Confidence: {confidence:.2f}",
+                            (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.7,
+                            (0, 255, 0),
+                            2,
+                        )
+                        cv2.putText(
+                            annotated_frame,
+                            f"Stable: {stable_detections}/{required_stable_detections}",
+                            (10, 60),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.7,
+                            (0, 255, 0),
+                            2,
+                        )
 
                         # If we have enough stable detections, we can finish
                         if stable_detections >= required_stable_detections:
-                            logger.info(f"Captured stable hand with confidence {best_confidence:.2f}")
+                            logger.info(
+                                f"Captured stable hand with confidence {best_confidence:.2f}"
+                            )
                             break
 
                     else:
-                        stable_detections = 0  # Reset counter if detection is not confident
+                        stable_detections = (
+                            0  # Reset counter if detection is not confident
+                        )
 
                     if show_preview:
-                        cv2.imshow('Hand Detection (Press q to quit)', annotated_frame)
+                        cv2.imshow("Hand Detection (Press q to quit)", annotated_frame)
 
                 else:
                     stable_detections = 0  # Reset counter if no hand detected
@@ -284,9 +334,16 @@ class HandDetector:
                     if show_preview:
                         # Show waiting message
                         waiting_frame = frame.copy()
-                        cv2.putText(waiting_frame, 'Place your hand in view...',
-                                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                        cv2.imshow('Hand Detection (Press q to quit)', waiting_frame)
+                        cv2.putText(
+                            waiting_frame,
+                            "Place your hand in view...",
+                            (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.7,
+                            (0, 0, 255),
+                            2,
+                        )
+                        cv2.imshow("Hand Detection (Press q to quit)", waiting_frame)
 
                 # Check for timeout
                 if current_time - start_time > duration:
@@ -294,7 +351,7 @@ class HandDetector:
                     break
 
                 # Check for quit key
-                if show_preview and cv2.waitKey(1) & 0xFF == ord('q'):
+                if show_preview and cv2.waitKey(1) & 0xFF == ord("q"):
                     logger.info("Webcam capture interrupted by user")
                     break
 
@@ -307,7 +364,9 @@ class HandDetector:
                 cv2.destroyAllWindows()
 
         if best_image is not None:
-            logger.info(f"Successfully captured hand image with confidence {best_confidence:.2f}")
+            logger.info(
+                f"Successfully captured hand image with confidence {best_confidence:.2f}"
+            )
         else:
             logger.warning("No suitable hand image captured")
 
@@ -343,11 +402,11 @@ class HandDetector:
         annotated_image = image.copy()
 
         try:
-            landmarks = landmarks_dict['landmarks']
+            landmarks = landmarks_dict["landmarks"]
 
             # Draw landmarks as circles
             for i, landmark in enumerate(landmarks):
-                x, y = landmark['x'], landmark['y']
+                x, y = landmark["x"], landmark["y"]
 
                 # Different colors for different parts of the hand
                 if i == 0:  # Wrist
@@ -366,31 +425,62 @@ class HandDetector:
                 cv2.circle(annotated_image, (x, y), 5, color, -1)
 
                 # Add landmark index
-                cv2.putText(annotated_image, str(i), (x + 5, y - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+                cv2.putText(
+                    annotated_image,
+                    str(i),
+                    (x + 5, y - 5),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.3,
+                    (255, 255, 255),
+                    1,
+                )
 
             # Draw connections (simplified version)
             # This is a basic implementation - for full connections use MediaPipe's drawing utils
             connections = [
-                (0, 1), (1, 2), (2, 3), (3, 4),  # Thumb
-                (0, 5), (5, 6), (6, 7), (7, 8),  # Index
-                (0, 9), (9, 10), (10, 11), (11, 12),  # Middle
-                (0, 13), (13, 14), (14, 15), (15, 16),  # Ring
-                (0, 17), (17, 18), (18, 19), (19, 20)  # Pinky
+                (0, 1),
+                (1, 2),
+                (2, 3),
+                (3, 4),  # Thumb
+                (0, 5),
+                (5, 6),
+                (6, 7),
+                (7, 8),  # Index
+                (0, 9),
+                (9, 10),
+                (10, 11),
+                (11, 12),  # Middle
+                (0, 13),
+                (13, 14),
+                (14, 15),
+                (15, 16),  # Ring
+                (0, 17),
+                (17, 18),
+                (18, 19),
+                (19, 20),  # Pinky
             ]
 
             for connection in connections:
                 start_idx, end_idx = connection
                 if start_idx < len(landmarks) and end_idx < len(landmarks):
-                    start_point = (landmarks[start_idx]['x'], landmarks[start_idx]['y'])
-                    end_point = (landmarks[end_idx]['x'], landmarks[end_idx]['y'])
-                    cv2.line(annotated_image, start_point, end_point, (255, 255, 255), 2)
+                    start_point = (landmarks[start_idx]["x"], landmarks[start_idx]["y"])
+                    end_point = (landmarks[end_idx]["x"], landmarks[end_idx]["y"])
+                    cv2.line(
+                        annotated_image, start_point, end_point, (255, 255, 255), 2
+                    )
 
             # Add handedness label
-            handedness = landmarks_dict.get('handedness', 'Unknown')
-            confidence = landmarks_dict.get('confidence', 0.0)
-            cv2.putText(annotated_image, f'{handedness} Hand (Conf: {confidence:.2f})',
-                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+            handedness = landmarks_dict.get("handedness", "Unknown")
+            confidence = landmarks_dict.get("confidence", 0.0)
+            cv2.putText(
+                annotated_image,
+                f"{handedness} Hand (Conf: {confidence:.2f})",
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (255, 255, 255),
+                2,
+            )
 
         except Exception as e:
             logger.error(f"Error drawing landmarks: {e}")
@@ -399,5 +489,5 @@ class HandDetector:
 
     def __del__(self):
         """Clean up MediaPipe resources."""
-        if hasattr(self, 'hands'):
+        if hasattr(self, "hands"):
             self.hands.close()

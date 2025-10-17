@@ -14,7 +14,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def load_image(image_path: str, target_size: Optional[Tuple[int, int]] = None) -> Optional[np.ndarray]:
+def load_image(
+    image_path: str, target_size: Optional[Tuple[int, int]] = None
+) -> Optional[np.ndarray]:
     """
     Load image from file path with optional resizing.
 
@@ -90,7 +92,9 @@ def save_image(image: np.ndarray, output_path: str, quality: int = 95) -> bool:
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
         # Set compression parameters
-        if output_path.lower().endswith('.jpg') or output_path.lower().endswith('.jpeg'):
+        if output_path.lower().endswith(".jpg") or output_path.lower().endswith(
+            ".jpeg"
+        ):
             encode_params = [cv2.IMWRITE_JPEG_QUALITY, quality]
         else:
             encode_params = []
@@ -133,7 +137,15 @@ def validate_image_format(image_path: str) -> bool:
             return False
 
         # Check file extension
-        supported_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'}
+        supported_extensions = {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".bmp",
+            ".tiff",
+            ".tif",
+            ".webp",
+        }
         file_extension = os.path.splitext(image_path)[1].lower()
 
         if file_extension not in supported_extensions:
@@ -190,7 +202,9 @@ def preprocess_image_for_detection(image: np.ndarray) -> np.ndarray:
         return image
 
 
-def crop_hand_region(image: np.ndarray, landmarks_dict: dict, padding: int = 50) -> Optional[np.ndarray]:
+def crop_hand_region(
+    image: np.ndarray, landmarks_dict: dict, padding: int = 50
+) -> Optional[np.ndarray]:
     """
     Crop image to focus on hand region.
 
@@ -214,17 +228,17 @@ def crop_hand_region(image: np.ndarray, landmarks_dict: dict, padding: int = 50)
     >>> if cropped_hand is not None:
     ...     cv2.imshow('Cropped Hand', cropped_hand)
     """
-    if not landmarks_dict or 'landmarks' not in landmarks_dict:
+    if not landmarks_dict or "landmarks" not in landmarks_dict:
         logger.error("No landmarks provided for cropping")
         return None
 
     try:
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
         height, width = image.shape[:2]
 
         # Find bounding box of all landmarks
-        x_coords = [lm['x'] for lm in landmarks]
-        y_coords = [lm['y'] for lm in landmarks]
+        x_coords = [lm["x"] for lm in landmarks]
+        y_coords = [lm["y"] for lm in landmarks]
 
         min_x = max(0, min(x_coords) - padding)
         max_x = min(width, max(x_coords) + padding)
@@ -242,8 +256,9 @@ def crop_hand_region(image: np.ndarray, landmarks_dict: dict, padding: int = 50)
         return None
 
 
-def batch_process_images(image_paths: List[str], output_dir: str,
-                        processor_func, **kwargs) -> List[str]:
+def batch_process_images(
+    image_paths: List[str], output_dir: str, processor_func, **kwargs
+) -> List[str]:
     """
     Process multiple images in batch.
 
@@ -301,7 +316,9 @@ def batch_process_images(image_paths: List[str], output_dir: str,
             if save_image(processed_image, output_path):
                 output_paths.append(output_path)
 
-        logger.info(f"Batch processing completed: {len(output_paths)}/{len(image_paths)} successful")
+        logger.info(
+            f"Batch processing completed: {len(output_paths)}/{len(image_paths)} successful"
+        )
         return output_paths
 
     except Exception as e:
@@ -351,13 +368,13 @@ def calculate_image_quality_score(image: np.ndarray) -> float:
 
         # 4. Overall quality (weighted average)
         quality_score = (
-            0.5 * sharpness_score +
-            0.3 * brightness_score +
-            0.2 * contrast_score
+            0.5 * sharpness_score + 0.3 * brightness_score + 0.2 * contrast_score
         )
 
-        logger.debug(f"Image quality components: sharpness={sharpness_score:.3f}, "
-                    f"brightness={brightness_score:.3f}, contrast={contrast_score:.3f}")
+        logger.debug(
+            f"Image quality components: sharpness={sharpness_score:.3f}, "
+            f"brightness={brightness_score:.3f}, contrast={contrast_score:.3f}"
+        )
 
         return max(0.0, min(1.0, quality_score))
 
@@ -366,8 +383,11 @@ def calculate_image_quality_score(image: np.ndarray) -> float:
         return 0.0
 
 
-def resize_image_maintain_aspect(image: np.ndarray, target_size: Tuple[int, int],
-                                fill_color: Tuple[int, int, int] = (0, 0, 0)) -> np.ndarray:
+def resize_image_maintain_aspect(
+    image: np.ndarray,
+    target_size: Tuple[int, int],
+    fill_color: Tuple[int, int, int] = (0, 0, 0),
+) -> np.ndarray:
     """
     Resize image while maintaining aspect ratio, padding with fill color.
 
@@ -405,18 +425,26 @@ def resize_image_maintain_aspect(image: np.ndarray, target_size: Tuple[int, int]
 
         # Create output image with target size
         if len(image.shape) == 3:
-            output = np.full((target_height, target_width, 3), fill_color, dtype=np.uint8)
+            output = np.full(
+                (target_height, target_width, 3), fill_color, dtype=np.uint8
+            )
         else:
-            output = np.full((target_height, target_width), fill_color[0], dtype=np.uint8)
+            output = np.full(
+                (target_height, target_width), fill_color[0], dtype=np.uint8
+            )
 
         # Calculate position to center the resized image
         x_offset = (target_width - new_width) // 2
         y_offset = (target_height - new_height) // 2
 
         # Place resized image in the center
-        output[y_offset:y_offset + new_height, x_offset:x_offset + new_width] = resized
+        output[y_offset : y_offset + new_height, x_offset : x_offset + new_width] = (
+            resized
+        )
 
-        logger.debug(f"Resized image from {width}x{height} to {target_width}x{target_height}")
+        logger.debug(
+            f"Resized image from {width}x{height} to {target_width}x{target_height}"
+        )
         return output
 
     except Exception as e:
@@ -424,7 +452,9 @@ def resize_image_maintain_aspect(image: np.ndarray, target_size: Tuple[int, int]
         return image
 
 
-def extract_color_statistics(image: np.ndarray, landmarks_dict: Optional[dict] = None) -> dict:
+def extract_color_statistics(
+    image: np.ndarray, landmarks_dict: Optional[dict] = None
+) -> dict:
     """
     Extract color statistics from image or hand region.
 
@@ -459,20 +489,16 @@ def extract_color_statistics(image: np.ndarray, landmarks_dict: Optional[dict] =
             std_color = np.std(image, axis=(0, 1))
 
             stats = {
-                'mean': mean_color.tolist(),
-                'std': std_color.tolist(),
-                'channels': ['blue', 'green', 'red']
+                "mean": mean_color.tolist(),
+                "std": std_color.tolist(),
+                "channels": ["blue", "green", "red"],
             }
         else:
             # Grayscale image
             mean_color = np.mean(image)
             std_color = np.std(image)
 
-            stats = {
-                'mean': [mean_color],
-                'std': [std_color],
-                'channels': ['gray']
-            }
+            stats = {"mean": [mean_color], "std": [std_color], "channels": ["gray"]}
 
         # Add HSV statistics for color images
         if len(image.shape) == 3:
@@ -480,9 +506,9 @@ def extract_color_statistics(image: np.ndarray, landmarks_dict: Optional[dict] =
             hsv_mean = np.mean(hsv, axis=(0, 1))
             hsv_std = np.std(hsv, axis=(0, 1))
 
-            stats['hsv_mean'] = hsv_mean.tolist()
-            stats['hsv_std'] = hsv_std.tolist()
-            stats['hsv_channels'] = ['hue', 'saturation', 'value']
+            stats["hsv_mean"] = hsv_mean.tolist()
+            stats["hsv_std"] = hsv_std.tolist()
+            stats["hsv_channels"] = ["hue", "saturation", "value"]
 
         logger.debug(f"Extracted color statistics: {stats}")
         return stats
@@ -492,8 +518,11 @@ def extract_color_statistics(image: np.ndarray, landmarks_dict: Optional[dict] =
         return {}
 
 
-def create_image_grid(images: List[np.ndarray], grid_size: Tuple[int, int],
-                     image_size: Tuple[int, int] = (200, 200)) -> np.ndarray:
+def create_image_grid(
+    images: List[np.ndarray],
+    grid_size: Tuple[int, int],
+    image_size: Tuple[int, int] = (200, 200),
+) -> np.ndarray:
     """
     Create a grid layout of multiple images.
 
@@ -526,7 +555,7 @@ def create_image_grid(images: List[np.ndarray], grid_size: Tuple[int, int],
         grid = np.zeros((grid_height, grid_width, 3), dtype=np.uint8)
 
         # Place images in grid
-        for i, image in enumerate(images[:rows * cols]):
+        for i, image in enumerate(images[: rows * cols]):
             row = i // cols
             col = i % cols
 

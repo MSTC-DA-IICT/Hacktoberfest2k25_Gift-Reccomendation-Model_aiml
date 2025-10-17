@@ -40,7 +40,9 @@ def validate_sentiment_score(score: Union[float, int]) -> bool:
         score = float(score)
         is_valid = 0.0 <= score <= 1.0
         if not is_valid:
-            logger.warning(f"Invalid sentiment score: {score} (must be between 0 and 1)")
+            logger.warning(
+                f"Invalid sentiment score: {score} (must be between 0 and 1)"
+            )
         return is_valid
     except (ValueError, TypeError):
         logger.error(f"Cannot convert sentiment score to float: {score}")
@@ -72,7 +74,7 @@ def validate_hand_size(size: str) -> bool:
         logger.error(f"Hand size must be string, got {type(size)}")
         return False
 
-    valid_sizes = {'small', 'medium', 'large'}
+    valid_sizes = {"small", "medium", "large"}
     is_valid = size.lower() in valid_sizes
 
     if not is_valid:
@@ -117,7 +119,7 @@ def validate_image_path(path: str) -> bool:
             return False
 
         # Check file extension
-        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'}
+        valid_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".webp"}
         file_extension = os.path.splitext(path)[1].lower()
 
         if file_extension not in valid_extensions:
@@ -211,7 +213,7 @@ def validate_email(email: str) -> bool:
             return False
 
         # Basic email regex pattern
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         is_valid = re.match(pattern, email.strip()) is not None
 
         if not is_valid:
@@ -224,8 +226,11 @@ def validate_email(email: str) -> bool:
         return False
 
 
-def validate_numpy_array(array: np.ndarray, expected_shape: Optional[tuple] = None,
-                        expected_dtype: Optional[np.dtype] = None) -> bool:
+def validate_numpy_array(
+    array: np.ndarray,
+    expected_shape: Optional[tuple] = None,
+    expected_dtype: Optional[np.dtype] = None,
+) -> bool:
     """
     Validate NumPy array properties.
 
@@ -259,11 +264,15 @@ def validate_numpy_array(array: np.ndarray, expected_shape: Optional[tuple] = No
             return False
 
         if expected_shape is not None and array.shape != expected_shape:
-            logger.error(f"Shape mismatch: expected {expected_shape}, got {array.shape}")
+            logger.error(
+                f"Shape mismatch: expected {expected_shape}, got {array.shape}"
+            )
             return False
 
         if expected_dtype is not None and array.dtype != expected_dtype:
-            logger.error(f"Dtype mismatch: expected {expected_dtype}, got {array.dtype}")
+            logger.error(
+                f"Dtype mismatch: expected {expected_dtype}, got {array.dtype}"
+            )
             return False
 
         # Check for NaN or infinite values
@@ -308,13 +317,13 @@ def validate_landmarks_dict(landmarks_dict: dict) -> bool:
             return False
 
         # Check required keys
-        required_keys = ['landmarks']
+        required_keys = ["landmarks"]
         for key in required_keys:
             if key not in landmarks_dict:
                 logger.error(f"Missing required key in landmarks: {key}")
                 return False
 
-        landmarks = landmarks_dict['landmarks']
+        landmarks = landmarks_dict["landmarks"]
 
         if not isinstance(landmarks, list):
             logger.error("Landmarks must be a list")
@@ -330,7 +339,7 @@ def validate_landmarks_dict(landmarks_dict: dict) -> bool:
                 logger.error(f"Landmark {i} must be a dictionary")
                 return False
 
-            required_coords = ['x', 'y', 'z']
+            required_coords = ["x", "y", "z"]
             for coord in required_coords:
                 if coord not in landmark:
                     logger.error(f"Landmark {i} missing coordinate: {coord}")
@@ -383,8 +392,12 @@ def validate_gift_dict(gift: dict) -> bool:
 
         # Required fields
         required_fields = [
-            'id', 'name', 'category', 'hand_size',
-            'sentiment_min', 'sentiment_max'
+            "id",
+            "name",
+            "category",
+            "hand_size",
+            "sentiment_min",
+            "sentiment_max",
         ]
 
         for field in required_fields:
@@ -394,29 +407,29 @@ def validate_gift_dict(gift: dict) -> bool:
 
         # Validate ID
         try:
-            int(gift['id'])
+            int(gift["id"])
         except (ValueError, TypeError):
             logger.error(f"Gift ID must be an integer: {gift['id']}")
             return False
 
         # Validate name
-        if not isinstance(gift['name'], str) or not gift['name'].strip():
+        if not isinstance(gift["name"], str) or not gift["name"].strip():
             logger.error("Gift name must be a non-empty string")
             return False
 
         # Validate category
-        if not isinstance(gift['category'], str) or not gift['category'].strip():
+        if not isinstance(gift["category"], str) or not gift["category"].strip():
             logger.error("Gift category must be a non-empty string")
             return False
 
         # Validate hand size
-        if not validate_hand_size(gift['hand_size']):
+        if not validate_hand_size(gift["hand_size"]):
             return False
 
         # Validate sentiment range
         try:
-            sent_min = float(gift['sentiment_min'])
-            sent_max = float(gift['sentiment_max'])
+            sent_min = float(gift["sentiment_min"])
+            sent_max = float(gift["sentiment_max"])
 
             if not (0 <= sent_min <= sent_max <= 1):
                 logger.error(f"Invalid sentiment range: [{sent_min}, {sent_max}]")
@@ -463,7 +476,7 @@ def validate_config_file(config_path: str) -> bool:
 
         # Check if file is readable
         try:
-            with open(config_path, 'r') as f:
+            with open(config_path, "r") as f:
                 f.read(1)  # Try to read first character
             return True
         except PermissionError:
@@ -502,10 +515,10 @@ def sanitize_filename(filename: str) -> str:
             return "unnamed_file"
 
         # Replace problematic characters
-        sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
+        sanitized = re.sub(r'[<>:"/\\|?*]', "_", filename)
 
         # Remove leading/trailing dots and spaces
-        sanitized = sanitized.strip('. ')
+        sanitized = sanitized.strip(". ")
 
         # Ensure it's not empty
         if not sanitized:

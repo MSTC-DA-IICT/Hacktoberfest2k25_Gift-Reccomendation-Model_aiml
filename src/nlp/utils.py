@@ -13,7 +13,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def load_tweet_data(path: str, text_column: str = 'text', label_column: str = 'sentiment') -> pd.DataFrame:
+def load_tweet_data(
+    path: str, text_column: str = "text", label_column: str = "sentiment"
+) -> pd.DataFrame:
     """
     Load tweet data from CSV file.
 
@@ -59,7 +61,9 @@ def load_tweet_data(path: str, text_column: str = 'text', label_column: str = 's
         final_len = len(df)
 
         if final_len < initial_len:
-            logger.warning(f"Dropped {initial_len - final_len} rows with missing values")
+            logger.warning(
+                f"Dropped {initial_len - final_len} rows with missing values"
+            )
 
         return df
 
@@ -68,7 +72,9 @@ def load_tweet_data(path: str, text_column: str = 'text', label_column: str = 's
         raise
 
 
-def split_data(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, random_state: int = 42) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def split_data(
+    X: np.ndarray, y: np.ndarray, test_size: float = 0.2, random_state: int = 42
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Split data into training and testing sets.
 
@@ -167,13 +173,17 @@ def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float
     # Handle division by zero
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+    f1 = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0.0
+    )
 
     metrics = {
-        'accuracy': round(accuracy, 4),
-        'precision': round(precision, 4),
-        'recall': round(recall, 4),
-        'f1': round(f1, 4)
+        "accuracy": round(accuracy, 4),
+        "precision": round(precision, 4),
+        "recall": round(recall, 4),
+        "f1": round(f1, 4),
     }
 
     return metrics
@@ -206,7 +216,9 @@ def encode_sentiment_labels(labels: List[str]) -> Tuple[np.ndarray, Dict[str, in
     unique_labels = sorted(list(set(labels)))
 
     if len(unique_labels) != 2:
-        raise ValueError(f"Expected 2 unique labels, got {len(unique_labels)}: {unique_labels}")
+        raise ValueError(
+            f"Expected 2 unique labels, got {len(unique_labels)}: {unique_labels}"
+        )
 
     # Map to 0 (negative) and 1 (positive)
     # Assume alphabetical order: negative comes before positive
@@ -220,7 +232,9 @@ def encode_sentiment_labels(labels: List[str]) -> Tuple[np.ndarray, Dict[str, in
     return encoded_labels, label_mapping
 
 
-def create_feature_matrix(tokenized_texts: List[List[str]], embeddings_model) -> np.ndarray:
+def create_feature_matrix(
+    tokenized_texts: List[List[str]], embeddings_model
+) -> np.ndarray:
     """
     Create feature matrix from tokenized texts using embeddings.
 
@@ -291,7 +305,7 @@ def preprocess_texts_for_training(texts: List[str], preprocessor) -> List[List[s
         # Skip empty tokenized texts
         if not tokens:
             skipped_count += 1
-            tokens = ['<empty>']  # Placeholder for empty texts
+            tokens = ["<empty>"]  # Placeholder for empty texts
 
         tokenized_texts.append(tokens)
 
@@ -302,7 +316,9 @@ def preprocess_texts_for_training(texts: List[str], preprocessor) -> List[List[s
     return tokenized_texts
 
 
-def balance_dataset(X: np.ndarray, y: np.ndarray, random_state: int = 42) -> Tuple[np.ndarray, np.ndarray]:
+def balance_dataset(
+    X: np.ndarray, y: np.ndarray, random_state: int = 42
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Balance dataset by undersampling the majority class.
 

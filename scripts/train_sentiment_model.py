@@ -32,18 +32,21 @@ from utils.validators import validate_config_file
 from utils.metrics import plot_training_history, plot_confusion_matrix
 import yaml
 
+
 def load_config(config_path: str) -> dict:
     """Load configuration from YAML file."""
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             config = yaml.safe_load(f)
         return config
     except Exception as e:
         print(f"Error loading config: {e}")
         return {}
 
-def load_labeled_tweets(file_path: str, text_column: str = 'text',
-                       label_column: str = 'sentiment') -> pd.DataFrame:
+
+def load_labeled_tweets(
+    file_path: str, text_column: str = "text", label_column: str = "sentiment"
+) -> pd.DataFrame:
     """Load labeled tweet data."""
     try:
         df = pd.read_csv(file_path)
@@ -61,8 +64,10 @@ def load_labeled_tweets(file_path: str, text_column: str = 'text',
     except Exception as e:
         raise RuntimeError(f"Error loading tweet data: {e}")
 
-def create_feature_matrix(texts: list, embeddings: Word2VecEmbeddings,
-                         preprocessor: TextPreprocessor) -> np.ndarray:
+
+def create_feature_matrix(
+    texts: list, embeddings: Word2VecEmbeddings, preprocessor: TextPreprocessor
+) -> np.ndarray:
     """Create feature matrix from texts using embeddings."""
     feature_vectors = []
 
@@ -73,55 +78,41 @@ def create_feature_matrix(texts: list, embeddings: Word2VecEmbeddings,
 
     return np.array(feature_vectors)
 
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Train sentiment classification model"
+    parser = argparse.ArgumentParser(description="Train sentiment classification model")
+    parser.add_argument(
+        "--tweets", "-t", required=True, help="Path to labeled tweets CSV file"
     )
     parser.add_argument(
-        '--tweets', '-t',
-        required=True,
-        help='Path to labeled tweets CSV file'
+        "--embeddings", "-e", required=True, help="Path to trained Word2Vec embeddings"
     )
     parser.add_argument(
-        '--embeddings', '-e',
-        required=True,
-        help='Path to trained Word2Vec embeddings'
+        "--output", "-o", required=True, help="Path to save trained sentiment model"
     )
     parser.add_argument(
-        '--output', '-o',
-        required=True,
-        help='Path to save trained sentiment model'
+        "--config",
+        "-c",
+        default="config/model_config.yaml",
+        help="Path to model configuration file",
     )
     parser.add_argument(
-        '--config', '-c',
-        default='config/model_config.yaml',
-        help='Path to model configuration file'
+        "--text-column", default="text", help="Name of column containing tweet text"
     )
     parser.add_argument(
-        '--text-column',
-        default='text',
-        help='Name of column containing tweet text'
+        "--label-column",
+        default="sentiment",
+        help="Name of column containing sentiment labels",
     )
     parser.add_argument(
-        '--label-column',
-        default='sentiment',
-        help='Name of column containing sentiment labels'
-    )
-    parser.add_argument(
-        '--test-size',
+        "--test-size",
         type=float,
         default=0.2,
-        help='Proportion of data to use for testing'
+        help="Proportion of data to use for testing",
     )
+    parser.add_argument("--save-plots", action="store_true", help="Save training plots")
     parser.add_argument(
-        '--save-plots',
-        action='store_true',
-        help='Save training plots'
-    )
-    parser.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Enable verbose logging'
+        "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
 
     args = parser.parse_args()
@@ -129,7 +120,7 @@ def main():
     # Setup logging
     logger = setup_logger(__name__)
     if args.verbose:
-        logger.setLevel('DEBUG')
+        logger.setLevel("DEBUG")
 
     logger.info("Starting sentiment model training script")
 
@@ -146,7 +137,7 @@ def main():
 
         # Load configuration
         config = load_config(args.config)
-        sentiment_config = config.get('nlp', {}).get('sentiment', {})
+        sentiment_config = config.get("nlp", {}).get("sentiment", {})
 
         logger.info(f"Loaded configuration from {args.config}")
 
@@ -165,7 +156,9 @@ def main():
         logger.info(f"Loading Word2Vec embeddings from {args.embeddings}")
         embeddings = Word2VecEmbeddings()
         embeddings.load_model(args.embeddings)
-        logger.info(f"Loaded embeddings with vocabulary size: {embeddings.get_vocabulary_size()}")
+        logger.info(
+            f"Loaded embeddings with vocabulary size: {embeddings.get_vocabulary_size()}"
+        )
 
         # Initialize preprocessor
         preprocessor = TextPreprocessor()
@@ -192,23 +185,26 @@ def main():
 
         # Split data
         X_train, X_test, y_train, y_test = split_data(X, y, test_size=args.test_size)
-        logger.info(f"Split data: {len(X_train)} training, {len(X_test)} testing samples")
+        logger.info(
+            f"Split data: {len(X_train)} training, {len(X_test)} testing samples"
+        )
 
         # Initialize model
         model = LogisticRegression()
         logger.info("Initialized logistic regression model")
 
         # Train model
-        learning_rate = sentiment_config.get('learning_rate', 0.01)
-        epochs = sentiment_config.get('epochs', 100)
+        learning_rate = sentiment_config.get("learning_rate", 0.01)
+        epochs = sentiment_config.get("epochs", 100)
 
         logger.info(f"Training model with lr={learning_rate}, epochs={epochs}")
 
         model.train(
-            X_train, y_train,
+            X_train,
+            y_train,
             learning_rate=learning_rate,
             epochs=epochs,
-            verbose=args.verbose
+            verbose=args.verbose,
         )
 
         # Evaluate model
@@ -239,41 +235,41 @@ def main():
 
         # Save training metadata
         metadata = {
-            'tweets_file': args.tweets,
-            'embeddings_file': args.embeddings,
-            'total_samples': len(df),
-            'training_samples': len(X_train),
-            'test_samples': len(X_test),
-            'feature_dim': X.shape[1],
-            'label_mapping': label_mapping,
-            'training_config': {
-                'learning_rate': learning_rate,
-                'epochs': epochs,
-                'test_size': args.test_size
+            "tweets_file": args.tweets,
+            "embeddings_file": args.embeddings,
+            "total_samples": len(df),
+            "training_samples": len(X_train),
+            "test_samples": len(X_test),
+            "feature_dim": X.shape[1],
+            "label_mapping": label_mapping,
+            "training_config": {
+                "learning_rate": learning_rate,
+                "epochs": epochs,
+                "test_size": args.test_size,
             },
-            'test_metrics': test_metrics,
-            'detailed_metrics': detailed_metrics
+            "test_metrics": test_metrics,
+            "detailed_metrics": detailed_metrics,
         }
 
-        metadata_path = args.output.replace('.pkl', '_metadata.pkl')
-        with open(metadata_path, 'wb') as f:
+        metadata_path = args.output.replace(".pkl", "_metadata.pkl")
+        with open(metadata_path, "wb") as f:
             pickle.dump(metadata, f)
         logger.info(f"Saved metadata to {metadata_path}")
 
         # Save plots if requested
         if args.save_plots:
-            plots_dir = os.path.join(output_dir, 'plots')
+            plots_dir = os.path.join(output_dir, "plots")
             os.makedirs(plots_dir, exist_ok=True)
 
             # Training history plot
             history = model.get_training_history()
-            if history['loss'] and history['accuracy']:
-                history_path = os.path.join(plots_dir, 'training_history.png')
+            if history["loss"] and history["accuracy"]:
+                history_path = os.path.join(plots_dir, "training_history.png")
                 plot_training_history(history, history_path)
                 logger.info(f"Saved training history plot to {history_path}")
 
             # Confusion matrix
-            cm_path = os.path.join(plots_dir, 'confusion_matrix.png')
+            cm_path = os.path.join(plots_dir, "confusion_matrix.png")
             labels = list(label_mapping.keys())
             plot_confusion_matrix(y_test, y_pred, labels=labels, save_path=cm_path)
             logger.info(f"Saved confusion matrix to {cm_path}")
@@ -285,7 +281,7 @@ def main():
             "This is terrible and disappointing",
             "It's okay, nothing special",
             "Absolutely fantastic experience!",
-            "Worst purchase ever made"
+            "Worst purchase ever made",
         ]
 
         for sentence in test_sentences:
@@ -296,10 +292,12 @@ def main():
             prob = model.predict_proba(vector)[0]
             pred = model.predict(vector)[0]
 
-            sentiment_label = 'positive' if pred == 1 else 'negative'
+            sentiment_label = "positive" if pred == 1 else "negative"
             confidence = prob if pred == 1 else (1 - prob)
 
-            logger.info(f"  '{sentence}' -> {sentiment_label} (confidence: {confidence:.3f})")
+            logger.info(
+                f"  '{sentence}' -> {sentiment_label} (confidence: {confidence:.3f})"
+            )
 
         # Training summary
         logger.info("Training Summary:")
@@ -317,6 +315,7 @@ def main():
     except Exception as e:
         logger.error(f"Training failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

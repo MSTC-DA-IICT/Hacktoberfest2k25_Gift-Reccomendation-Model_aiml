@@ -2,63 +2,173 @@
   "gifts": [
     {
       "id": 1,
-      "name": "Toy Car",
+      "name": "Colorful Building Blocks",
       "category": "toy",
+      "hand_size": "small",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$15-$30",
+      "description": "Creative building blocks for imaginative play"
+    },
+    {
+      "id": 2,
+      "name": "Adventure Storybook",
+      "category": "book",
       "hand_size": "small",
       "sentiment_min": 0.5,
       "sentiment_max": 1.0,
       "price_range": "$10-$20",
-      "description": "Colorful toy car for kids"
+      "description": "Exciting adventure stories for young readers"
     },
     {
-      "id": 2,
-      "name": "Story Book",
+      "id": 3,
+      "name": "Art Supply Kit",
+      "category": "art_supplies",
+      "hand_size": "small",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$20-$40",
+      "description": "Complete art kit with crayons, markers, and paper"
+    },
+    {
+      "id": 4,
+      "name": "Comfort Teddy Bear",
+      "category": "comfort_item",
+      "hand_size": "small",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$15-$25",
+      "description": "Soft, cuddly teddy bear for comfort"
+    },
+    {
+      "id": 5,
+      "name": "Calming Picture Book",
       "category": "book",
       "hand_size": "small",
       "sentiment_min": 0.0,
       "sentiment_max": 0.5,
       "price_range": "$8-$15",
-      "description": "Engaging storybook for young readers"
-    },
-    {
-      "id": 3,
-      "name": "Stylish Watch",
-      "category": "accessory",
-      "hand_size": "medium",
-      "sentiment_min": 0.5,
-      "sentiment_max": 1.0,
-      "price_range": "$50-$100",
-      "description": "Elegant watch for daily wear"
-    },
-    {
-      "id": 4,
-      "name": "Comfort Pillow",
-      "category": "home",
-      "hand_size": "medium",
-      "sentiment_min": 0.0,
-      "sentiment_max": 0.5,
-      "price_range": "$25-$40",
-      "description": "Soft pillow for relaxation"
-    },
-    {
-      "id": 5,
-      "name": "Elegant Jewelry",
-      "category": "jewelry",
-      "hand_size": "large",
-      "sentiment_min": 0.5,
-      "sentiment_max": 1.0,
-      "price_range": "$100-$300",
-      "description": "Beautiful jewelry piece"
+      "description": "Gentle, soothing stories for relaxation"
     },
     {
       "id": 6,
-      "name": "Coffee Maker",
+      "name": "Stylish Watch",
+      "category": "accessory",
+      "hand_size": "medium",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$50-$120",
+      "description": "Modern, fashionable timepiece"
+    },
+    {
+      "id": 7,
+      "name": "Wireless Earbuds",
+      "category": "gadget",
+      "hand_size": "medium",
+      "sentiment_min": 0.5,
+      "sentiment_max": 1.0,
+      "price_range": "$40-$80",
+      "description": "High-quality wireless audio experience"
+    },
+    {
+      "id": 8,
+      "name": "Sports Water Bottle",
+      "category": "sports",
+      "hand_size": "medium",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$20-$35",
+      "description": "Insulated bottle for active lifestyle"
+    },
+    {
+      "id": 9,
+      "name": "Cozy Throw Pillow",
+      "category": "comfort_item",
+      "hand_size": "medium",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$25-$45",
+      "description": "Soft pillow for relaxation and comfort"
+    },
+    {
+      "id": 10,
+      "name": "Aromatherapy Candle",
+      "category": "home_decor",
+      "hand_size": "medium",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$15-$30",
+      "description": "Relaxing scented candle for mood enhancement"
+    },
+    {
+      "id": 11,
+      "name": "Premium Leather Wallet",
+      "category": "accessory",
+      "hand_size": "large",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$80-$150",
+      "description": "Elegant leather wallet with multiple compartments"
+    },
+    {
+      "id": 12,
+      "name": "Smart Fitness Tracker",
+      "category": "gadget",
+      "hand_size": "large",
+      "sentiment_min": 0.5,
+      "sentiment_max": 1.0,
+      "price_range": "$100-$200",
+      "description": "Advanced fitness tracking with heart rate monitor"
+    },
+    {
+      "id": 13,
+      "name": "Professional Tool Set",
+      "category": "tool",
+      "hand_size": "large",
+      "sentiment_min": 0.6,
+      "sentiment_max": 1.0,
+      "price_range": "$120-$250",
+      "description": "Complete tool set for DIY projects"
+    },
+    {
+      "id": 14,
+      "name": "Electric Kettle",
       "category": "appliance",
       "hand_size": "large",
       "sentiment_min": 0.0,
       "sentiment_max": 0.5,
-      "price_range": "$50-$150",
-      "description": "Quality coffee maker"
+      "price_range": "$40-$80",
+      "description": "Quick-heating kettle for hot beverages"
+    },
+    {
+      "id": 15,
+      "name": "Memory Foam Pillow",
+      "category": "comfort_item",
+      "hand_size": "large",
+      "sentiment_min": 0.0,
+      "sentiment_max": 0.5,
+      "price_range": "$35-$65",
+      "description": "Ergonomic pillow for better sleep"
+    },
+    {
+      "id": 16,
+      "name": "Bluetooth Speaker",
+      "category": "gadget",
+      "hand_size": "medium",
+      "sentiment_min": 0.4,
+      "sentiment_max": 1.0,
+      "price_range": "$60-$120",
+      "description": "Portable speaker with excellent sound quality"
+    },
+    {
+      "id": 17,
+      "name": "Gourmet Tea Set",
+      "category": "home",
+      "hand_size": "medium",
+      "sentiment_min": 0.3,
+      "sentiment_max": 0.8,
+      "price_range": "$30-$60",
+      "description": "Premium tea collection with accessories"
     }
   ]
 }

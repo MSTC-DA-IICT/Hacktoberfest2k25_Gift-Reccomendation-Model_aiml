@@ -29,7 +29,7 @@ class TestRecommendationEngine:
                 "sentiment_min": 0.5,
                 "sentiment_max": 1.0,
                 "price_range": "$10-$20",
-                "description": "Colorful toy car for kids"
+                "description": "Colorful toy car for kids",
             },
             {
                 "id": 2,
@@ -39,7 +39,7 @@ class TestRecommendationEngine:
                 "sentiment_min": 0.0,
                 "sentiment_max": 0.5,
                 "price_range": "$8-$15",
-                "description": "Engaging storybook for young readers"
+                "description": "Engaging storybook for young readers",
             },
             {
                 "id": 3,
@@ -49,8 +49,8 @@ class TestRecommendationEngine:
                 "sentiment_min": 0.6,
                 "sentiment_max": 1.0,
                 "price_range": "$50-$100",
-                "description": "Elegant watch for daily wear"
-            }
+                "description": "Elegant watch for daily wear",
+            },
         ]
 
         # Create mock database
@@ -109,10 +109,10 @@ class TestRecommendationEngine:
 
         # Check recommendation structure
         rec = recommendations[0]
-        assert 'name' in rec
-        assert 'confidence' in rec
-        assert 'sentiment_input' in rec
-        assert 'hand_size_input' in rec
+        assert "name" in rec
+        assert "confidence" in rec
+        assert "sentiment_input" in rec
+        assert "hand_size_input" in rec
 
     def test_calculate_confidence(self):
         """Test confidence calculation."""
@@ -128,7 +128,7 @@ class TestRecommendationEngine:
             "hand_size": "small",
             "sentiment_min": 0.7,
             "sentiment_max": 0.9,
-            "category": "toy"
+            "category": "toy",
         }
 
         confidence = self.engine.calculate_confidence(gift, 0.8, "small")
@@ -140,7 +140,7 @@ class TestRecommendationEngine:
             "hand_size": "large",
             "sentiment_min": 0.7,
             "sentiment_max": 0.9,
-            "category": "toy"
+            "category": "toy",
         }
 
         confidence = self.engine.calculate_confidence(gift, 0.8, "small")
@@ -153,7 +153,7 @@ class TestRecommendationEngine:
             "hand_size": "small",
             "sentiment_min": 0.0,
             "sentiment_max": 0.3,
-            "category": "toy"
+            "category": "toy",
         }
 
         confidence = self.engine.calculate_confidence(gift, 0.8, "small")
@@ -172,24 +172,28 @@ class TestRecommendationEngine:
     def test_get_recommendation_summary(self):
         """Test recommendation summary generation."""
         # Mock some candidates
-        self.mock_gift_db.filter_by_size_and_sentiment.return_value = [self.mock_gifts[0]]
+        self.mock_gift_db.filter_by_size_and_sentiment.return_value = [
+            self.mock_gifts[0]
+        ]
 
         summary = self.engine.get_recommendation_summary(0.8, "small")
 
         assert isinstance(summary, dict)
-        assert 'total_candidates' in summary
-        assert 'input_analysis' in summary
-        assert summary['total_candidates'] >= 0
+        assert "total_candidates" in summary
+        assert "input_analysis" in summary
+        assert summary["total_candidates"] >= 0
 
     def test_batch_recommend(self):
         """Test batch recommendation processing."""
         requests = [
-            {'sentiment': 0.8, 'hand_size': 'small'},
-            {'sentiment': 0.3, 'hand_size': 'medium'}
+            {"sentiment": 0.8, "hand_size": "small"},
+            {"sentiment": 0.3, "hand_size": "medium"},
         ]
 
         # Mock some candidates
-        self.mock_gift_db.filter_by_size_and_sentiment.return_value = [self.mock_gifts[0]]
+        self.mock_gift_db.filter_by_size_and_sentiment.return_value = [
+            self.mock_gifts[0]
+        ]
 
         results = self.engine.batch_recommend(requests)
 
@@ -197,17 +201,17 @@ class TestRecommendationEngine:
         assert len(results) == 2
 
         for result in results:
-            assert 'request_id' in result
-            assert 'recommendations' in result
-            assert 'sentiment' in result
-            assert 'hand_size' in result
+            assert "request_id" in result
+            assert "recommendations" in result
+            assert "sentiment" in result
+            assert "hand_size" in result
 
     def test_batch_recommend_invalid_requests(self):
         """Test batch recommendation with invalid requests."""
         invalid_requests = [
-            {'sentiment': 0.8},  # Missing hand_size
-            {'hand_size': 'small'},  # Missing sentiment
-            {}  # Missing both
+            {"sentiment": 0.8},  # Missing hand_size
+            {"hand_size": "small"},  # Missing sentiment
+            {},  # Missing both
         ]
 
         results = self.engine.batch_recommend(invalid_requests)
@@ -217,14 +221,14 @@ class TestRecommendationEngine:
 
         # All should have errors
         for result in results:
-            assert 'error' in result
+            assert "error" in result
 
     def test_update_recommendation_weights(self):
         """Test updating recommendation weights."""
         new_weights = {
-            'category_match': 0.5,
-            'sentiment_alignment': 0.3,
-            'exact_size_match': 0.2
+            "category_match": 0.5,
+            "sentiment_alignment": 0.3,
+            "exact_size_match": 0.2,
         }
 
         self.engine.update_recommendation_weights(new_weights)
@@ -237,19 +241,19 @@ class TestRecommendationEngine:
         """Test engine statistics retrieval."""
         # Mock database statistics
         mock_stats = {
-            'total_gifts': 10,
-            'categories': ['toy', 'book'],
-            'size_distribution': {'small': 3, 'medium': 4, 'large': 3}
+            "total_gifts": 10,
+            "categories": ["toy", "book"],
+            "size_distribution": {"small": 3, "medium": 4, "large": 3},
         }
         self.mock_gift_db.get_statistics.return_value = mock_stats
 
         stats = self.engine.get_engine_statistics()
 
         assert isinstance(stats, dict)
-        assert 'total_gifts' in stats
-        assert 'min_confidence_threshold' in stats
-        assert 'recommendation_weights' in stats
-        assert 'database_stats' in stats
+        assert "total_gifts" in stats
+        assert "min_confidence_threshold" in stats
+        assert "recommendation_weights" in stats
+        assert "database_stats" in stats
 
     def test_recommendation_with_explanations(self):
         """Test that recommendations include explanations when requested."""
@@ -259,18 +263,20 @@ class TestRecommendationEngine:
         recommendations = self.engine.recommend(0.8, "small", include_explanations=True)
 
         if recommendations:
-            assert 'explanation' in recommendations[0]
-            assert isinstance(recommendations[0]['explanation'], str)
+            assert "explanation" in recommendations[0]
+            assert isinstance(recommendations[0]["explanation"], str)
 
     def test_recommendation_without_explanations(self):
         """Test that recommendations exclude explanations when not requested."""
         candidates = [self.mock_gifts[0]]
         self.mock_gift_db.filter_by_size_and_sentiment.return_value = candidates
 
-        recommendations = self.engine.recommend(0.8, "small", include_explanations=False)
+        recommendations = self.engine.recommend(
+            0.8, "small", include_explanations=False
+        )
 
         if recommendations:
-            assert 'explanation' not in recommendations[0]
+            assert "explanation" not in recommendations[0]
 
     def test_max_results_limit(self):
         """Test that max_results parameter is respected."""

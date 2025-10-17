@@ -53,10 +53,10 @@ class GiftRecommendationCLI:
             logger.info("Loading models and components...")
 
             # Initialize base components
-            self.models['preprocessor'] = TextPreprocessor()
-            self.models['detector'] = HandDetector()
-            self.models['estimator'] = HandSizeEstimator()
-            self.models['visualizer'] = HandVisualizer()
+            self.models["preprocessor"] = TextPreprocessor()
+            self.models["detector"] = HandDetector()
+            self.models["estimator"] = HandSizeEstimator()
+            self.models["visualizer"] = HandVisualizer()
 
             # Load trained models
             self._load_nlp_models()
@@ -76,7 +76,7 @@ class GiftRecommendationCLI:
         if os.path.exists(embeddings_path):
             embeddings = Word2VecEmbeddings()
             embeddings.load_model(embeddings_path)
-            self.models['embeddings'] = embeddings
+            self.models["embeddings"] = embeddings
             logger.info("Loaded Word2Vec embeddings")
         else:
             logger.warning(f"Word2Vec model not found: {embeddings_path}")
@@ -86,7 +86,7 @@ class GiftRecommendationCLI:
         if os.path.exists(sentiment_path):
             sentiment_model = LogisticRegression()
             sentiment_model.load_model(sentiment_path)
-            self.models['sentiment_model'] = sentiment_model
+            self.models["sentiment_model"] = sentiment_model
             logger.info("Loaded sentiment model")
         else:
             logger.warning(f"Sentiment model not found: {sentiment_path}")
@@ -97,8 +97,8 @@ class GiftRecommendationCLI:
         if os.path.exists(gift_config_path):
             gift_db = GiftDatabase(gift_config_path)
             recommendation_engine = RecommendationEngine(gift_db)
-            self.models['gift_db'] = gift_db
-            self.models['recommendation_engine'] = recommendation_engine
+            self.models["gift_db"] = gift_db
+            self.models["recommendation_engine"] = recommendation_engine
             logger.info("Loaded recommendation system")
         else:
             logger.error(f"Gift database not found: {gift_config_path}")
@@ -106,13 +106,15 @@ class GiftRecommendationCLI:
     def analyze_sentiment(self, text: str) -> Tuple[Optional[float], Optional[str]]:
         """Analyze sentiment of input text."""
         try:
-            if not self.models.get('embeddings') or not self.models.get('sentiment_model'):
+            if not self.models.get("embeddings") or not self.models.get(
+                "sentiment_model"
+            ):
                 logger.error("NLP models not loaded")
                 return None, None
 
-            preprocessor = self.models['preprocessor']
-            embeddings = self.models['embeddings']
-            sentiment_model = self.models['sentiment_model']
+            preprocessor = self.models["preprocessor"]
+            embeddings = self.models["embeddings"]
+            sentiment_model = self.models["sentiment_model"]
 
             # Preprocess text
             tokens = preprocessor.preprocess(text)
@@ -128,14 +130,16 @@ class GiftRecommendationCLI:
             prob = sentiment_model.predict_proba(vector)[0]
             pred = sentiment_model.predict(vector)[0]
 
-            sentiment_label = 'positive' if pred == 1 else 'negative'
+            sentiment_label = "positive" if pred == 1 else "negative"
             return prob, sentiment_label
 
         except Exception as e:
             logger.error(f"Error analyzing sentiment: {e}")
             return None, None
 
-    def detect_hand_size(self, image_path: str, save_visualization: bool = False) -> Tuple[Optional[str], Optional[Dict], Optional[str]]:
+    def detect_hand_size(
+        self, image_path: str, save_visualization: bool = False
+    ) -> Tuple[Optional[str], Optional[Dict], Optional[str]]:
         """Detect hand size from image."""
         try:
             # Load image
@@ -143,8 +147,8 @@ class GiftRecommendationCLI:
             if image is None:
                 return None, None, "Failed to load image"
 
-            detector = self.models['detector']
-            estimator = self.models['estimator']
+            detector = self.models["detector"]
+            estimator = self.models["estimator"]
 
             # Detect hand landmarks
             landmarks = detector.get_landmarks(image)
@@ -162,7 +166,7 @@ class GiftRecommendationCLI:
             # Save visualization if requested
             visualization_path = None
             if save_visualization:
-                visualizer = self.models['visualizer']
+                visualizer = self.models["visualizer"]
                 visualized_image = visualizer.draw_measurements(
                     image, landmarks, measurements, size_class
                 )
@@ -180,10 +184,12 @@ class GiftRecommendationCLI:
             logger.error(error_msg)
             return None, None, error_msg
 
-    def get_recommendations(self, sentiment_score: float, hand_size: str, max_results: int = 5) -> List[Dict]:
+    def get_recommendations(
+        self, sentiment_score: float, hand_size: str, max_results: int = 5
+    ) -> List[Dict]:
         """Get gift recommendations."""
         try:
-            recommendation_engine = self.models.get('recommendation_engine')
+            recommendation_engine = self.models.get("recommendation_engine")
             if not recommendation_engine:
                 logger.error("Recommendation engine not loaded")
                 return []
@@ -192,7 +198,7 @@ class GiftRecommendationCLI:
                 sentiment=sentiment_score,
                 hand_size=hand_size.lower(),
                 max_results=max_results,
-                include_explanations=True
+                include_explanations=True,
             )
 
             return recommendations
@@ -201,66 +207,73 @@ class GiftRecommendationCLI:
             logger.error(f"Error getting recommendations: {e}")
             return []
 
-    def process_single_request(self, text: str, image_path: str, save_visualization: bool = False) -> Dict:
+    def process_single_request(
+        self, text: str, image_path: str, save_visualization: bool = False
+    ) -> Dict:
         """Process a single recommendation request."""
         result = {
-            'input': {
-                'text': text,
-                'image_path': image_path
-            },
-            'sentiment': {},
-            'hand_detection': {},
-            'recommendations': [],
-            'success': False,
-            'error': None
+            "input": {"text": text, "image_path": image_path},
+            "sentiment": {},
+            "hand_detection": {},
+            "recommendations": [],
+            "success": False,
+            "error": None,
         }
 
         try:
             # Analyze sentiment
             sentiment_score, sentiment_label = self.analyze_sentiment(text)
             if sentiment_score is not None:
-                result['sentiment'] = {
-                    'score': sentiment_score,
-                    'label': sentiment_label,
-                    'confidence': sentiment_score if sentiment_label == 'positive' else (1 - sentiment_score)
+                result["sentiment"] = {
+                    "score": sentiment_score,
+                    "label": sentiment_label,
+                    "confidence": (
+                        sentiment_score
+                        if sentiment_label == "positive"
+                        else (1 - sentiment_score)
+                    ),
                 }
             else:
-                result['error'] = "Failed to analyze sentiment"
+                result["error"] = "Failed to analyze sentiment"
                 return result
 
             # Detect hand size
-            hand_size, measurements, visualization_path = self.detect_hand_size(image_path, save_visualization)
+            hand_size, measurements, visualization_path = self.detect_hand_size(
+                image_path, save_visualization
+            )
             if hand_size is not None:
-                result['hand_detection'] = {
-                    'size': hand_size,
-                    'measurements': measurements,
-                    'visualization_path': visualization_path
+                result["hand_detection"] = {
+                    "size": hand_size,
+                    "measurements": measurements,
+                    "visualization_path": visualization_path,
                 }
             else:
-                result['error'] = "Failed to detect hand size"
+                result["error"] = "Failed to detect hand size"
                 return result
 
             # Get recommendations
             recommendations = self.get_recommendations(sentiment_score, hand_size)
             if recommendations:
-                result['recommendations'] = recommendations
-                result['success'] = True
+                result["recommendations"] = recommendations
+                result["success"] = True
             else:
-                result['error'] = "No recommendations found"
+                result["error"] = "No recommendations found"
 
             return result
 
         except Exception as e:
-            result['error'] = str(e)
+            result["error"] = str(e)
             logger.error(f"Error processing request: {e}")
             return result
 
-    def process_batch_requests(self, tweets_file: str, image_path: str, max_results: int = 5) -> List[Dict]:
+    def process_batch_requests(
+        self, tweets_file: str, image_path: str, max_results: int = 5
+    ) -> List[Dict]:
         """Process batch of tweets with single hand image."""
         try:
             # Load tweets
             df = pd.read_csv(tweets_file)
-            if 'text' not in df.columns:
+            if "text" not in df.columns:
                 raise ValueError("CSV must contain 'text' column")
 
             logger.info(f"Processing {len(df)} tweets from {tweets_file}")
@@ -273,7 +286,7 @@ class GiftRecommendationCLI:
             results = []
 
             for idx, row in df.iterrows():
-                text = row['text']
+                text = row["text"]
                 logger.info(f"Processing tweet {idx+1}/{len(df)}")
 
                 # Analyze sentiment
@@ -282,17 +295,16 @@ class GiftRecommendationCLI:
                     continue
 
                 # Get recommendations
-                recommendations = self.get_recommendations(sentiment_score, hand_size, max_results)
+                recommendations = self.get_recommendations(
+                    sentiment_score, hand_size, max_results
+                )
 
                 result = {
-                    'index': idx,
-                    'text': text,
-                    'sentiment': {
-                        'score': sentiment_score,
-                        'label': sentiment_label
-                    },
-                    'hand_size': hand_size,
-                    'recommendations': recommendations
+                    "index": idx,
+                    "text": text,
+                    "sentiment": {"score": sentiment_score, "label": sentiment_label},
+                    "hand_size": hand_size,
+                    "recommendations": recommendations,
                 }
                 results.append(result)
 
@@ -311,18 +323,18 @@ def cli():
 
 
 @cli.command()
-@click.option('--text', '-t', help='Text to analyze for sentiment')
-@click.option('--tweets', help='CSV file with tweets to process')
-@click.option('--hand-image', '-i', required=True, help='Path to hand image')
-@click.option('--output', '-o', help='Output JSON file path')
-@click.option('--max-results', default=5, help='Maximum number of recommendations')
-@click.option('--save-viz', is_flag=True, help='Save hand detection visualization')
-@click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
+@click.option("--text", "-t", help="Text to analyze for sentiment")
+@click.option("--tweets", help="CSV file with tweets to process")
+@click.option("--hand-image", "-i", required=True, help="Path to hand image")
+@click.option("--output", "-o", help="Output JSON file path")
+@click.option("--max-results", default=5, help="Maximum number of recommendations")
+@click.option("--save-viz", is_flag=True, help="Save hand detection visualization")
+@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
 def recommend(text, tweets, hand_image, output, max_results, save_viz, verbose):
     """Generate gift recommendations."""
 
     if verbose:
-        logger.setLevel('DEBUG')
+        logger.setLevel("DEBUG")
 
     # Validate inputs
     if not text and not tweets:
@@ -354,25 +366,31 @@ def recommend(text, tweets, hand_image, output, max_results, save_viz, verbose):
 
             result = cli_app.process_single_request(text, hand_image, save_viz)
 
-            if result['success']:
+            if result["success"]:
                 click.echo("✅ Recommendation completed successfully!")
 
                 # Display results
-                sentiment = result['sentiment']
-                hand_detection = result['hand_detection']
-                recommendations = result['recommendations']
+                sentiment = result["sentiment"]
+                hand_detection = result["hand_detection"]
+                recommendations = result["recommendations"]
 
                 click.echo(f"\n📊 Analysis Results:")
-                click.echo(f"  Sentiment: {sentiment['label']} ({sentiment['score']:.3f})")
+                click.echo(
+                    f"  Sentiment: {sentiment['label']} ({sentiment['score']:.3f})"
+                )
                 click.echo(f"  Hand Size: {hand_detection['size']}")
 
-                if hand_detection.get('visualization_path'):
-                    click.echo(f"  Visualization saved: {hand_detection['visualization_path']}")
+                if hand_detection.get("visualization_path"):
+                    click.echo(
+                        f"  Visualization saved: {hand_detection['visualization_path']}"
+                    )
 
                 click.echo(f"\n🎁 Top {len(recommendations)} Recommendations:")
                 for i, rec in enumerate(recommendations, 1):
                     click.echo(f"  {i}. {rec['name']} ({rec['confidence']:.1%} match)")
-                    click.echo(f"     Category: {rec['category']}, Price: {rec['price_range']}")
+                    click.echo(
+                        f"     Category: {rec['category']}, Price: {rec['price_range']}"
+                    )
 
             else:
                 click.echo(f"❌ Error: {result['error']}", err=True)
@@ -380,7 +398,7 @@ def recommend(text, tweets, hand_image, output, max_results, save_viz, verbose):
             # Save results if output specified
             if output:
                 os.makedirs(os.path.dirname(output), exist_ok=True)
-                with open(output, 'w') as f:
+                with open(output, "w") as f:
                     json.dump(result, f, indent=2, default=str)
                 click.echo(f"\n💾 Results saved to: {output}")
 
@@ -398,19 +416,23 @@ def recommend(text, tweets, hand_image, output, max_results, save_viz, verbose):
                 click.echo(f"✅ Processed {len(results)} tweets successfully!")
 
                 # Display summary
-                avg_sentiment = np.mean([r['sentiment']['score'] for r in results])
-                positive_count = sum(1 for r in results if r['sentiment']['label'] == 'positive')
+                avg_sentiment = np.mean([r["sentiment"]["score"] for r in results])
+                positive_count = sum(
+                    1 for r in results if r["sentiment"]["label"] == "positive"
+                )
 
                 click.echo(f"\n📊 Batch Summary:")
                 click.echo(f"  Total processed: {len(results)}")
                 click.echo(f"  Average sentiment: {avg_sentiment:.3f}")
-                click.echo(f"  Positive sentiment: {positive_count}/{len(results)} ({positive_count/len(results):.1%})")
+                click.echo(
+                    f"  Positive sentiment: {positive_count}/{len(results)} ({positive_count/len(results):.1%})"
+                )
                 click.echo(f"  Hand size: {results[0]['hand_size']}")
 
                 # Save results
                 output_path = output or "batch_recommendations.json"
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
-                with open(output_path, 'w') as f:
+                with open(output_path, "w") as f:
                     json.dump(results, f, indent=2, default=str)
                 click.echo(f"\n💾 Results saved to: {output_path}")
 
@@ -465,13 +487,15 @@ def interactive():
 
             result = cli_app.process_single_request(text, image_path, save_viz)
 
-            if result['success']:
-                sentiment = result['sentiment']
-                hand_detection = result['hand_detection']
-                recommendations = result['recommendations']
+            if result["success"]:
+                sentiment = result["sentiment"]
+                hand_detection = result["hand_detection"]
+                recommendations = result["recommendations"]
 
                 click.echo(f"\n📊 Results:")
-                click.echo(f"Sentiment: {sentiment['label']} ({sentiment['score']:.3f})")
+                click.echo(
+                    f"Sentiment: {sentiment['label']} ({sentiment['score']:.3f})"
+                )
                 click.echo(f"Hand Size: {hand_detection['size']}")
 
                 click.echo(f"\n🎁 Recommendations:")
@@ -480,8 +504,10 @@ def interactive():
                     click.echo(f"   {rec['description']}")
 
                 if click.confirm("Save detailed results to file?", default=False):
-                    output_file = click.prompt("Output filename", default="recommendation_result.json")
-                    with open(output_file, 'w') as f:
+                    output_file = click.prompt(
+                        "Output filename", default="recommendation_result.json"
+                    )
+                    with open(output_file, "w") as f:
                         json.dump(result, f, indent=2, default=str)
                     click.echo(f"Results saved to {output_file}")
 
@@ -502,17 +528,23 @@ def interactive():
                 click.echo("Invalid image path. Please try again.")
                 continue
 
-            max_results = click.prompt("Maximum recommendations per tweet", default=3, type=int)
+            max_results = click.prompt(
+                "Maximum recommendations per tweet", default=3, type=int
+            )
 
             click.echo("Processing batch...")
 
-            results = cli_app.process_batch_requests(tweets_file, image_path, max_results)
+            results = cli_app.process_batch_requests(
+                tweets_file, image_path, max_results
+            )
 
             if results:
                 click.echo(f"✅ Processed {len(results)} tweets")
 
-                output_file = click.prompt("Output filename", default="batch_results.json")
-                with open(output_file, 'w') as f:
+                output_file = click.prompt(
+                    "Output filename", default="batch_results.json"
+                )
+                with open(output_file, "w") as f:
                     json.dump(results, f, indent=2, default=str)
                 click.echo(f"Results saved to {output_file}")
             else:
@@ -523,21 +555,24 @@ def interactive():
             click.echo("\n🔧 Model Status:")
             models = cli_app.models
             status_items = [
-                ("Text Preprocessor", models.get('preprocessor') is not None),
-                ("Word2Vec Embeddings", models.get('embeddings') is not None),
-                ("Sentiment Model", models.get('sentiment_model') is not None),
-                ("Hand Detector", models.get('detector') is not None),
-                ("Size Estimator", models.get('estimator') is not None),
-                ("Gift Database", models.get('gift_db') is not None),
-                ("Recommendation Engine", models.get('recommendation_engine') is not None),
+                ("Text Preprocessor", models.get("preprocessor") is not None),
+                ("Word2Vec Embeddings", models.get("embeddings") is not None),
+                ("Sentiment Model", models.get("sentiment_model") is not None),
+                ("Hand Detector", models.get("detector") is not None),
+                ("Size Estimator", models.get("estimator") is not None),
+                ("Gift Database", models.get("gift_db") is not None),
+                (
+                    "Recommendation Engine",
+                    models.get("recommendation_engine") is not None,
+                ),
             ]
 
             for model_name, is_loaded in status_items:
                 status = "✅ Loaded" if is_loaded else "❌ Not Available"
                 click.echo(f"  {model_name}: {status}")
 
-            if models.get('gift_db'):
-                stats = models['gift_db'].get_statistics()
+            if models.get("gift_db"):
+                stats = models["gift_db"].get_statistics()
                 click.echo(f"\nDatabase Stats:")
                 click.echo(f"  Total gifts: {stats['total_gifts']}")
                 click.echo(f"  Categories: {len(stats['categories'])}")
@@ -563,13 +598,13 @@ def status():
     click.echo("Model Status:")
     models = cli_app.models
     status_items = [
-        ("Text Preprocessor", models.get('preprocessor') is not None),
-        ("Word2Vec Embeddings", models.get('embeddings') is not None),
-        ("Sentiment Model", models.get('sentiment_model') is not None),
-        ("Hand Detector", models.get('detector') is not None),
-        ("Size Estimator", models.get('estimator') is not None),
-        ("Gift Database", models.get('gift_db') is not None),
-        ("Recommendation Engine", models.get('recommendation_engine') is not None),
+        ("Text Preprocessor", models.get("preprocessor") is not None),
+        ("Word2Vec Embeddings", models.get("embeddings") is not None),
+        ("Sentiment Model", models.get("sentiment_model") is not None),
+        ("Hand Detector", models.get("detector") is not None),
+        ("Size Estimator", models.get("estimator") is not None),
+        ("Gift Database", models.get("gift_db") is not None),
+        ("Recommendation Engine", models.get("recommendation_engine") is not None),
     ]
 
     for model_name, is_loaded in status_items:
@@ -598,5 +633,5 @@ def status():
         click.echo(f"  {status} {path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
