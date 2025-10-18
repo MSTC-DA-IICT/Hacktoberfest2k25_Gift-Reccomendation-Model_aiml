@@ -1,0 +1,11 @@
+text,sentiment
+I love this new phone! It's amazing!,positive
+"This is terrible, I hate it",negative
+"Great day today, feeling happy",positive
+"Worst experience ever, so disappointed",negative
+"Amazing product, highly recommend!",positive
+"Not worth the money, very poor quality",negative
+"Fantastic service, will buy again",positive
+Complete waste of time and money,negative
+"Excellent quality, very satisfied",positive
+Disappointed with the purchase,negative

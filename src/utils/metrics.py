@@ -528,6 +528,96 @@ def calculate_landmark_error(
         return None
 
 
+def plot_metrics_bar_chart(
+    metrics: Dict[str, float],
+    save_path: Optional[str] = None,
+    title: str = "Model Performance Metrics"
+) -> Optional[plt.Figure]:
+    """
+    Plot accuracy, precision, and recall as a bar chart.
+
+    Parameters
+    ----------
+    metrics : Dict[str, float]
+        Dictionary containing accuracy, precision, and recall scores
+    save_path : Optional[str]
+        Path to save the plot
+    title : str, default="Model Performance Metrics"
+        Title for the plot
+
+    Returns
+    -------
+    Optional[plt.Figure]
+        Matplotlib figure object or None if error
+
+    Examples
+    --------
+    >>> metrics = {'accuracy': 0.85, 'precision': 0.82, 'recall': 0.80}
+    >>> fig = plot_metrics_bar_chart(metrics, 'metrics.png')
+    """
+    try:
+        # Extract metrics for plotting
+        metric_names = ['accuracy', 'precision', 'recall']
+        metric_values = []
+        metric_labels = []
+        
+        for metric in metric_names:
+            if metric in metrics:
+                metric_values.append(metrics[metric])
+                metric_labels.append(metric.title())
+        
+        if not metric_values:
+            logger.warning("No valid metrics found for plotting")
+            return None
+
+        # Create figure
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Create bar chart
+        bars = ax.bar(metric_labels, metric_values, 
+                     color=['#2E86AB', '#A23B72', '#F18F01'], 
+                     alpha=0.8, edgecolor='black', linewidth=1)
+        
+        # Customize the plot
+        ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
+        ax.set_ylabel('Score', fontsize=12, fontweight='bold')
+        ax.set_xlabel('Metrics', fontsize=12, fontweight='bold')
+        
+        # Set y-axis limits
+        ax.set_ylim(0, 1.0)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, metric_values):
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                   f'{value:.3f}', ha='center', va='bottom', 
+                   fontweight='bold', fontsize=11)
+        
+        # Add grid for better readability
+        ax.grid(True, alpha=0.3, axis='y')
+        ax.set_axisbelow(True)
+        
+        # Add horizontal line at 0.8 for reference
+        ax.axhline(y=0.8, color='red', linestyle='--', alpha=0.7, 
+                  label='Good Performance Threshold')
+        ax.legend()
+        
+        # Adjust layout
+        plt.tight_layout()
+        
+        # Save if path provided
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            logger.info(f"Metrics bar chart saved to {save_path}")
+        
+        logger.debug("Generated metrics bar chart")
+        return fig
+        
+    except Exception as e:
+        logger.error(f"Error plotting metrics bar chart: {e}")
+        return None
+
+
 def generate_performance_report(
     metrics: Dict[str, Union[float, int]], model_name: str = "Model"
 ) -> str:

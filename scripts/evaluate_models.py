@@ -49,6 +49,8 @@ from utils.metrics import (
     calculate_recommendation_metrics,
     calculate_hand_detection_metrics,
     generate_performance_report,
+    plot_confusion_matrix,
+    plot_metrics_bar_chart,
 )
 
 
@@ -124,6 +126,39 @@ def evaluate_nlp_model(test_data_path: str, models_dir: str, logger) -> Dict:
             metrics["roc_auc"] = auc
         except ImportError:
             logger.warning("sklearn not available for ROC AUC calculation")
+
+        # Generate visualizations
+        try:
+            logger.info("Generating visualization plots...")
+            
+            # Create plots directory if it doesn't exist
+            plots_dir = "reports/plots"
+            os.makedirs(plots_dir, exist_ok=True)
+            
+            # Generate confusion matrix
+            confusion_matrix_path = os.path.join(plots_dir, "nlp_confusion_matrix.png")
+            label_names = ["Negative", "Positive"]  # Based on the encoding
+            plot_confusion_matrix(
+                y_true, 
+                y_pred, 
+                labels=label_names,
+                save_path=confusion_matrix_path,
+                normalize=False
+            )
+            logger.info(f"Confusion matrix saved to {confusion_matrix_path}")
+            
+            # Generate metrics bar chart
+            metrics_chart_path = os.path.join(plots_dir, "nlp_metrics_chart.png")
+            plot_metrics_bar_chart(
+                metrics,
+                save_path=metrics_chart_path,
+                title="NLP Sentiment Model Performance Metrics"
+            )
+            logger.info(f"Metrics bar chart saved to {metrics_chart_path}")
+            
+        except Exception as e:
+            logger.warning(f"Error generating visualizations: {e}")
+            # Continue with evaluation even if visualization fails
 
         # Add sample predictions for analysis
         sample_predictions = []
