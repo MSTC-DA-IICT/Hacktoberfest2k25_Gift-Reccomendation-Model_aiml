@@ -292,6 +292,22 @@ def evaluate_cv_model(test_images_dir: str, logger) -> Dict:
             "sample_results": sample_results,
         }
 
+        # Create and save JSON summary
+        summary = {
+            "total_images": total_images,
+            "successful_detections": successful_detections,
+            "detection_rate": detection_rate,
+            "average_confidence": avg_confidence,
+            "size_distribution": size_distribution
+        }
+
+        # Save JSON summary
+        os.makedirs("reports/summary", exist_ok=True)
+        with open("reports/summary/cv_evaluation_summary.json", "w") as f:
+            json.dump(summary, f, indent=4)
+        
+        logger.info("Saved CV evaluation summary to reports/summary/cv_evaluation_summary.json")
+
         logger.info("CV model evaluation completed")
         return results
 
